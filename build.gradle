@@ -1,0 +1,118 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+
+buildscript {
+  ext {
+    androidToolsVersion = "3.1.0-rc01"
+    kotlinVersion = "1.2.21"
+    ankoVersion = "0.10.3"
+  }
+  
+  repositories {
+    google()
+    jcenter()
+    mavenCentral()
+  }
+  
+  dependencies {
+    classpath "com.android.tools.build:gradle:${androidToolsVersion}"
+    classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlinVersion}"
+  }
+}
+
+/**
+ * Publish all local
+ */
+
+def publishProjects = ["kdux-android",
+                       "kdux-core",
+                       "kdux-processor"]
+
+task publishAllLocal() {
+  doLast {
+    println("All published")
+  }
+}
+
+
+
+/**
+ * Configure all projects
+ */
+allprojects {currentProject ->
+  buildscript {
+    ext {
+      arrowVersion        = "0.6.1"
+      slf4jVersion        = "1.7.25"
+      kotlinPoetVersion   = "0.7.0"
+      googleAutoVersion   = "1.0-rc4"
+      junitVersion        = "4.12"
+      
+      SOURCE_VERSION      = "1.8"
+      MIN_SDK_VERSION     = 24
+      TARGET_SDK_VERSION  = 27
+      COMPILE_SDK_VERSION = 27
+    }
+  }
+ 
+  // PLUGINS
+  apply plugin: 'idea'
+  
+  
+  // IF NOT APP THEN APPLY
+  if (!["example-app","kdux-android"].contains(currentProject.name)) {
+    apply plugin: 'java'
+    apply plugin: 'kotlin'
+    
+    sourceCompatibility = SOURCE_VERSION
+    targetCompatibility = SOURCE_VERSION
+    
+  } else if (currentProject.name == "kdux-android") {
+    apply plugin: 'com.android.library'
+    apply plugin: 'kotlin-android'
+    apply plugin: 'kotlin-android-extensions'
+  } else {
+    apply plugin: 'com.android.application'
+    apply plugin: 'kotlin-android'
+    apply plugin: 'kotlin-android-extensions'
+    apply plugin: 'kotlin-kapt'
+  }
+  
+  
+  
+  kotlin {
+    experimental { coroutines 'enable' }
+  }
+  
+  
+  if (publishProjects.contains(currentProject.name))
+    publishAllLocal.dependsOn(publishToMavenLocal)
+  
+  // REPOS
+  repositories {
+    google()
+    jcenter()
+    mavenCentral()
+    maven {
+      url "http://dl.bintray.com/kotlin/kotlinx"
+    }
+  }
+
+  dependencies {
+    implementation(
+        "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion",
+        "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion",
+        "org.jetbrains.kotlinx:kotlinx-collections-immutable:0.1",
+        "io.arrow-kt:arrow-core:${arrowVersion}",
+        "io.arrow-kt:arrow-typeclasses:${arrowVersion}",
+        "io.arrow-kt:arrow-instances:${arrowVersion}",
+        "io.arrow-kt:arrow-data:${arrowVersion}",
+        "io.arrow-kt:arrow-syntax:${arrowVersion}",
+        "io.arrow-kt:arrow-effects-kotlinx-coroutines:${arrowVersion}",
+        "org.slf4j:slf4j-api:${slf4jVersion}"
+    )
+  
+    testImplementation("junit:junit:${junitVersion}")
+  }
+}
+
+

@@ -1,0 +1,3 @@
+include ':example-app', ':kdux-core', ':kdux-processor', ':example-lib', ':kdux-android'
+
+rootProject.name = "kdux-project"

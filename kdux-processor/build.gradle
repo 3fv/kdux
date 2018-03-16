@@ -1,0 +1,35 @@
+apply plugin: 'java-library'
+apply plugin: 'kotlin-kapt'
+apply plugin: 'java'
+
+task sourceJar(type: Jar) {
+  from sourceSets.main.allSource
+}
+
+dependencies {
+  
+  implementation(
+      "com.squareup:kotlinpoet:${kotlinPoetVersion}",
+      "com.google.auto.service:auto-service:${googleAutoVersion}"
+  )
+  
+  implementation project(':kdux-core')
+  
+  kapt("com.google.auto.service:auto-service:${googleAutoVersion}")
+  
+}
+
+publishing {
+  publications {
+    mavenJava(MavenPublication) {
+      groupId 'mapper'
+      artifactId project.name
+      version project.version
+      from components.java
+  
+      artifact sourceJar {
+        classifier "sources"
+      }
+    }
+  }
+}
