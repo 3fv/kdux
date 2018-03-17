@@ -38,7 +38,7 @@ task sourceJar(type: Jar) {
 publishing {
   publications {
     mavenJava(MavenPublication) {
-      groupId 'mapper'
+      groupId 'org.densebrain'
       artifactId project.name
       version project.version
   

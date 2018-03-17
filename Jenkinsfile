@@ -1,6 +1,5 @@
-@Library("mapper-jenkins-libs")_
 
-import ai.mapper.jenkins.*
+
 
 node("master") {
   

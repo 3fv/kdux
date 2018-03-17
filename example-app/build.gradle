@@ -1,8 +1,8 @@
-
+//apply plugin: 'kotline-kapt'
 android {
   compileSdkVersion COMPILE_SDK_VERSION
   defaultConfig {
-    applicationId "ai.mapper.kdux.example"
+    applicationId "org.densebrain.kdux.example"
     minSdkVersion MIN_SDK_VERSION
     targetSdkVersion TARGET_SDK_VERSION
     versionCode 1

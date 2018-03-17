@@ -3,10 +3,16 @@
 ## Use it in an android project
 
 ```groovy
+repositories {
+    maven {
+        url  "https://dl.bintray.com/densebrain/oss" 
+    }
+}
+
 dependencies {
-  implementation "mapper:kdux-core:1+"
-  implementation "mapper:kdux-android:1+"
+  implementation "org.densebrain:kdux-core:1+"
+  implementation "org.densebrain:kdux-android:1+"
   
-  kapt "mapper:kdux-processor:1+"
+  kapt "org.densebrain:kdux-processor:1+"
 }
 ```

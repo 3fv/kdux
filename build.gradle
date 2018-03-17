@@ -2,9 +2,11 @@
 
 buildscript {
   ext {
+    VERSION = file("${rootDir}/version.txt").text
     androidToolsVersion = "3.1.0-rc01"
     kotlinVersion = "1.2.21"
     ankoVersion = "0.10.3"
+    binTrayKey = System.getenv("BINTRAY_API_KEY") ?: ""
   }
   
   repositories {
@@ -16,6 +18,8 @@ buildscript {
   dependencies {
     classpath "com.android.tools.build:gradle:${androidToolsVersion}"
     classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlinVersion}"
+    classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
+  
   }
 }
 
@@ -33,12 +37,22 @@ task publishAllLocal() {
   }
 }
 
+task installAllLocal() {
+  doLast {
+    println("All installed")
+  }
+}
+
 
 
 /**
  * Configure all projects
  */
 allprojects {currentProject ->
+  
+  // SET VERSION
+  currentProject.version = VERSION
+  
   buildscript {
     ext {
       arrowVersion        = "0.6.1"
@@ -84,8 +98,29 @@ allprojects {currentProject ->
   }
   
   
-  if (publishProjects.contains(currentProject.name))
+  if (publishProjects.contains(currentProject.name)) {
+    apply plugin: 'com.jfrog.bintray'
+    
+    bintray {
+      user = 'jonglanz'
+      key = binTrayKey
+      publications = ['mavenJava']
+      pkg {
+        repo = 'oss'
+        name = currentProject.name
+        userOrg = 'densebrain'
+        licenses = ['Apache-2.0']
+        vcsUrl = 'https://github.com/jglanz/kdux.git'
+        version {
+          name = VERSION
+          released = new Date()
+        }
+      }
+    }
+  
     publishAllLocal.dependsOn(publishToMavenLocal)
+    installAllLocal.dependsOn(install)
+  }
   
   // REPOS
   repositories {
