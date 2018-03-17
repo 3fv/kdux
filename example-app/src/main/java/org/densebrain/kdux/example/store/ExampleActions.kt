@@ -2,14 +2,12 @@ package org.densebrain.kdux.example.store
 
 import org.densebrain.kdux.actions.AbstractActions
 import org.densebrain.kdux.reducers.Reducer
-import org.densebrain.kdux.annotations.ActionReducer
-import org.densebrain.kdux.annotations.ActionsBuilder
 
 /**
  * Sample action builder
  */
-@ActionsBuilder
-abstract class ExampleActions : AbstractActions<ExampleState>() {
+
+class ExampleActions : AbstractActions<ExampleState>() {
 
   /**
    * Return the state type
@@ -18,35 +16,34 @@ abstract class ExampleActions : AbstractActions<ExampleState>() {
     get() = ExampleState::class
 
 
+  fun addSumToCounter(values:List<Int?>) = reducer { it.copy(count = it.count + values.filterNotNull().sum()) }
+
   /**
    * Short hand reducer
    */
-  @ActionReducer
-  open fun incrementCounter(increment:Int) = reducer { it.copy(count = it.count + increment) }
+  fun incrementCounter(increment:Int) = reducer { it.copy(count = it.count + increment) }
 
   /**
    * Counter 2
    */
-  @ActionReducer
-  open fun incrementCounter2(increment:Int) = reducer { it.copy(count2 = it.count2 + increment) }
+  fun incrementCounter2(increment:Int) = reducer { it.copy(count2 = it.count2 + increment) }
 
   /**
    * Medium
    */
-  @ActionReducer
-  open fun multiplyCounter(multiplier:Int): Reducer<ExampleState> {
-    return reducer { it.copy(count = it.count * multiplier) }
+  
+  fun multiplyCounter(multiplier:Int) {
+    reducer { it.copy(count = it.count * multiplier) }
   }
 
   /**
    * Long
    */
-  @ActionReducer
-  open fun divideCounter(divisor:Int): Reducer<ExampleState> {
-    return object : Reducer<ExampleState> {
+  fun divideCounter(divisor:Int) {
+    getStore().dispatch(this,object : Reducer<ExampleState> {
       override fun handle(state: ExampleState): ExampleState {
         return state.copy(count = state.count / divisor)
       }
-    }
+    })
   }
 }

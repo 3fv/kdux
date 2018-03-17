@@ -5,6 +5,8 @@ import org.densebrain.kdux.annotations.ActionsBuilder
 import com.google.auto.service.AutoService
 import com.squareup.kotlinpoet.*
 import java.io.File
+import java.lang.reflect.ParameterizedType
+import javax.annotation.Nullable
 import javax.annotation.processing.*
 import javax.lang.model.SourceVersion
 import javax.lang.model.element.ExecutableElement
@@ -29,6 +31,13 @@ class KDuxProcessor : AbstractProcessor() {
     private val ANNO_ACTION_REDUCER = ActionReducer::class.java
     private const val GENERATE_KOTLIN_CODE_OPTION = "generate.kotlin.code"
     private const val KAPT_KOTLIN_GENERATED_OPTION = "kapt.kotlin.generated"
+
+
+    private val TYPE_CONVERSIONS = mapOf(
+      "java.util.List" to kotlin.collections.List::class.qualifiedName!!,
+      "java.lang.Integer" to Int::class.qualifiedName
+
+    )
   }
 
   /**
@@ -93,6 +102,36 @@ class KDuxProcessor : AbstractProcessor() {
     return true
   }
 
+
+  private fun checkTypeName(typeName:TypeName):TypeName {
+
+//    if (TYPE_CONVERSIONS[] == null)
+//      return typeName
+
+    if (typeName is ParameterizedTypeName) {
+      info("Checking type: ${typeName}")
+      val convertTo = TYPE_CONVERSIONS[typeName.rawType.toString()]
+      if (convertTo != null) {
+        info("Converting to: ${convertTo}")
+
+        val typeArgs = typeName.typeArguments.map { checkTypeName(it) }
+
+        return ParameterizedTypeName.get(
+          convertTo.asClassName(),
+          *typeArgs.toTypedArray()
+        )
+
+
+      }
+    } else if (typeName is ClassName) {
+      val convertTo = TYPE_CONVERSIONS[typeName.toString()]
+      if (convertTo != null) {
+        return convertTo.asClassName()
+      }
+    }
+    return typeName
+  }
+
   /**
    * Generate action classes
    */
@@ -123,12 +162,11 @@ class KDuxProcessor : AbstractProcessor() {
       .primaryConstructor(FunSpec.constructorBuilder().build())
 
 
-    //info("generate ${generatedClassName} ${generateKotlinCode} ${options}")
-
     // REDUCERS
     reducerElements.forEach {
       if (it.modifiers.contains(Modifier.FINAL))
         error("${element.simpleName}.${it.simpleName} is FINAL, make open")
+
 
       val reducerSpec = FunSpec
         .builder(it.simpleName.toString())
@@ -136,9 +174,17 @@ class KDuxProcessor : AbstractProcessor() {
         .returns(it.returnType.asTypeName())
 
       // PARAMETERS
+
       val parameterNames = it.parameters.map { it.simpleName.toString() }
-      it.parameters.forEach {param ->
-        val paramTypeName = param.asType().asTypeName()
+      it.parameters.forEach { param ->
+        val paramType = param.asType()
+
+        var paramTypeName = checkTypeName(paramType.asTypeName())
+        if (paramType.getAnnotation(Nullable::class.java) != null) {
+          paramTypeName = paramTypeName.asNullable()
+        }
+
+
         reducerSpec.addParameter(param.simpleName.toString(),paramTypeName)
       }
 

@@ -1,5 +1,8 @@
 package org.densebrain.kdux.reducers
 
+import org.densebrain.kdux.actions.Actions
+import org.densebrain.kdux.store.StoreContext
+
 
 typealias ReducerType<T>  = (state:T) -> T
 interface Reducer<T> {
@@ -7,13 +10,12 @@ interface Reducer<T> {
 }
 
 
-fun <T> reducer(body: ReducerType<T>): Reducer<T> {
-  return object : Reducer<T> {
-    override fun handle(state: T): T {
-      return body.invoke(state)
-    }
+fun <T> reducer(actions: Actions<*>, body: ReducerType<T>) =StoreContext.store.dispatch(actions, object : Reducer<T> {
+  override fun handle(state: T): T {
+    return body.invoke(state)
   }
-}
+})
+
 
 
 /**

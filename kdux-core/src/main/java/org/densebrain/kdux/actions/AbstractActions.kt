@@ -35,5 +35,5 @@ abstract class AbstractActions<S: State> : Actions<S> {
   /**
    * Easy way to create a reducer in an actions class fully typed
    */
-  fun reducer(body: ReducerType<S>): Reducer<S> = org.densebrain.kdux.reducers.reducer(body)
+  fun reducer(body: ReducerType<S>) = org.densebrain.kdux.reducers.reducer(this,body)
 }

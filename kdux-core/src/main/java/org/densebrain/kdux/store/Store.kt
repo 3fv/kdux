@@ -18,7 +18,7 @@ typealias PendingActionReducer = Pair<Actions<*>, Reducer<*>>
 /**
  * Root State type
  */
-typealias RootState = ImmutableMap<KClass<*>, State>
+typealias RootState = Map<KClass<*>, State>
 
 open class Store(
   vararg actionClazzes: KClass<*>
@@ -68,21 +68,22 @@ open class Store(
     }
 
     // RUN REDUCERS
-    val newRootState = rootState.mutate { rootState ->
-      val reducersByState = pendingReducers.groupBy { it.first.stateType }
-      reducersByState
-        .entries
-        .forEach { (stateType, reducers) ->
-          var state = rootState[stateType]!!
-          reducers.forEach { reducer ->
-            @Suppress("UNCHECKED_CAST")
-            state = (reducer.second as Reducer<Any>).handle(state) as State
-            rootState[stateType] = state
-          }
-        }
-    }
+    val newRootState = rootState.toMutableMap()
 
-    rootState = newRootState
+    val reducersByState = pendingReducers.groupBy { it.first.stateType }
+    reducersByState
+      .entries
+      .forEach { (stateType, reducers) ->
+        var state = newRootState[stateType]!!
+        for (reducer in reducers) {
+          @Suppress("UNCHECKED_CAST")
+          state = (reducer.second as Reducer<Any>).handle(state) as State
+        }
+
+        newRootState[stateType] = state
+      }
+
+    rootState = newRootState.toMap()
 
     updateScheduler.schedule(DefaultStoreUpdate(newRootState))
   }
@@ -214,18 +215,20 @@ open class Store(
    * Initializer
    */
   init {
-    rootState = rootState.mutate {
-      @Suppress("UNCHECKED_CAST")
-      val actions = actionClazzes.map { getActions(it as KClass<Actions<*>>) }
+    val newRootState = rootState.toMutableMap()
+    @Suppress("UNCHECKED_CAST")
+    val actions = actionClazzes.map { getActions(it as KClass<Actions<*>>) }
 
-      for (action in actions) {
-        if (it[action.stateType] != null)
-          continue
+    for (action in actions) {
+      if (newRootState[action.stateType] != null)
+        continue
 
-        val leafState = action.createState() ?: action.stateType.java.newInstance()
-        it[action.stateType] = leafState
-      }
+      val leafState = action.createState() ?: action.stateType.java.newInstance()
+      newRootState[action.stateType] = leafState
     }
+
+    rootState = newRootState.toMap()
+
   }
 
   /**
