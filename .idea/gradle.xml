@@ -12,7 +12,6 @@
             <option value="$PROJECT_DIR$/example-lib" />
             <option value="$PROJECT_DIR$/kdux-android" />
             <option value="$PROJECT_DIR$/kdux-core" />
-            <option value="$PROJECT_DIR$/kdux-processor" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

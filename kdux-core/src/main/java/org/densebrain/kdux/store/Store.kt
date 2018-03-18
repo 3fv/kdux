@@ -3,9 +3,6 @@ package org.densebrain.kdux.store
 import org.densebrain.kdux.reducers.Reducer
 import org.densebrain.kdux.actions.Actions
 import arrow.effects.DeferredKW
-import kotlinx.collections.immutable.ImmutableMap
-import kotlinx.collections.immutable.immutableMapOf
-import kotlinx.collections.immutable.mutate
 import java.util.concurrent.ConcurrentLinkedDeque
 import kotlin.collections.LinkedHashSet
 import kotlin.reflect.KClass
@@ -19,6 +16,8 @@ typealias PendingActionReducer = Pair<Actions<*>, Reducer<*>>
  * Root State type
  */
 typealias RootState = Map<KClass<*>, State>
+
+typealias StateSelector<R,T> = (state:T) -> R
 
 open class Store(
   vararg actionClazzes: KClass<*>
@@ -39,7 +38,7 @@ open class Store(
   /**
    * Internal map of all leafs
    */
-  private var rootState: RootState = immutableMapOf()
+  private var rootState: RootState = mapOf()
 
   /**
    * Internal map for Actions
@@ -155,14 +154,14 @@ open class Store(
    * Simplified observer creation
    */
   inline fun <reified T: State, reified R> observe(
-    crossinline updater: StoreObserverUpdater<R, T>,
-    crossinline getter: StoreObserverGetter<R, T> = { state:T -> state as R }
+    crossinline updater: StoreUpdateHandler<R, T>,
+    crossinline getter: StoreSelector<R, T> = { state:T -> state as R }
   ): StoreObserver<R, T> = addObserver(StoreObserver<R, T>(
     this,
     T::class,
     R::class,
     { state: T -> getter(state) },
-    { newValue: R, state: T, store: Store -> updater(newValue, state, store) }
+    { newValue: R, oldValue: R?, state: T -> updater(newValue, oldValue, state) }
   ))
 
 

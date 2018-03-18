@@ -4,29 +4,33 @@ import org.slf4j.LoggerFactory
 import java.io.Closeable
 import kotlin.reflect.KClass
 
-typealias StoreObserverUpdater<R,T> = (newValue:R,state:T,store: Store) -> Unit
+typealias StoreUpdateHandler<R,T> = (newValue:R, oldValue:R?, state:T) -> Unit
 
-typealias StoreObserverGetter<R,T> = (state:T) -> R
+typealias StoreSelector<R,T> = (state:T) -> R
 
 class StoreObserver<R,T: State>  (
   private val store: Store,
   private val stateKlazz:KClass<T>,
   private val returnKlazz:KClass<*>,
-  private val getter: StoreObserverGetter<R, T>,
-  private val updater: StoreObserverUpdater<R, T>
+  private val getter: StoreSelector<R, T>,
+  private val updater: StoreUpdateHandler<R, T>
 ) : Closeable {
 
   companion object {
     private val log = LoggerFactory.getLogger(StoreObserver::class.java)
   }
 
+  /**
+   * Last value cached for performance
+   */
   private var lastValue:R? = null
+
 
   /**
    * Run the observer's updater function
    */
+  @Suppress("UNCHECKED_CAST")
   fun run(rootState: RootState) {
-    @Suppress("UNCHECKED_CAST")
     val leafState = rootState[stateKlazz] as? T ?: run {
       log.warn("Leaf state is null ${stateKlazz.java.name}")
       return
@@ -34,10 +38,11 @@ class StoreObserver<R,T: State>  (
 
     val newValue = getter(leafState)
     if (newValue !== lastValue) {
-      lastValue = newValue
+      val lastValue = this.lastValue
+      this.lastValue = newValue
 
       if (isAttached)
-        updater(newValue,leafState,store)
+        updater(newValue,lastValue,leafState)
     }
   }
 

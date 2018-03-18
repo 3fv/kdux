@@ -9,20 +9,34 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import kotlinx.android.synthetic.main.activity_main.view.*
+import org.densebrain.kdux.store.observations
 import org.jetbrains.anko.contentView
 import org.jetbrains.anko.sdk25.coroutines.onClick
 
 class MainActivity : AppCompatActivity() {
 
-
+  // EXAMPLE NOT USED
   private var countObserver = observe<Int, ExampleState>(
-    { value, _, _ -> (this.contentView as View).counter.text = value.toString() },
+    { value, _, _ -> (contentView as View).counter.text = value.toString() },
     { state -> state.count }
   )
 
+  // EXAMPLE NOT USED
   private var countObserver2 = observe<ExampleState>(
-    { value, _, _ -> (this.contentView as View).counter2.text = value.count2.toString() }
+    { value, _, _ -> (contentView as View).counter2.text = value.count2.toString() }
   )
+
+  // EXAMPLE USED
+  private val observers = observations {
+    observe<Int, ExampleState> { state -> state.count }
+      .update { value, _, _ ->
+        (contentView as View).counter.text = value.toString()
+      }
+
+    observe<ExampleState>().update({ value, _, _ ->
+      (contentView as View).counter2.text = value.count2.toString()
+    })
+  }
 
   /**
    * Attach observers on create
@@ -31,8 +45,8 @@ class MainActivity : AppCompatActivity() {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_main)
 
-    countObserver.attach()
-    countObserver2.attach()
+    observers.attach()
+
     contentView!!.incrementer.onClick {
       actions<ExampleActions>().incrementCounter(1)
       actions<ExampleActions>().incrementCounter2(1)

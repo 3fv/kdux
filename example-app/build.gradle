@@ -1,4 +1,3 @@
-//apply plugin: 'kotline-kapt'
 android {
   compileSdkVersion COMPILE_SDK_VERSION
   defaultConfig {
@@ -19,24 +18,22 @@ android {
 
 dependencies {
   implementation(
-      'com.android.support:appcompat-v7:27.1.0',
-      'com.android.support.constraint:constraint-layout:1.0.2'
+      "com.android.support:appcompat-v7:${androidSupportVersion}",
+      'com.android.support.constraint:constraint-layout:1.0.2',
+       "org.jetbrains.anko:anko-sdk25:$ankoVersion",
+       "org.jetbrains.anko:anko-sdk25-coroutines:$ankoVersion",
+       "org.jetbrains.anko:anko-appcompat-v7:$ankoVersion",
+       "org.jetbrains.anko:anko-appcompat-v7-coroutines:$ankoVersion",
+       "org.jetbrains.anko:anko-sqlite:$ankoVersion",
+       "org.jetbrains.anko:anko-commons:$ankoVersion"
   )
-  implementation "org.jetbrains.anko:anko-sdk25:$ankoVersion"
-  implementation "org.jetbrains.anko:anko-sdk25-coroutines:$ankoVersion"
-  implementation "org.jetbrains.anko:anko-appcompat-v7:$ankoVersion"
-  implementation "org.jetbrains.anko:anko-appcompat-v7-coroutines:$ankoVersion"
-  implementation "org.jetbrains.anko:anko-sqlite:$ankoVersion"
-  implementation "org.jetbrains.anko:anko-commons:$ankoVersion"
   
   androidTestImplementation(
       'com.android.support.test:runner:1.0.1',
       'com.android.support.test.espresso:espresso-core:3.0.1'
   )
   
-  
-  implementation project(':kdux-core')
-  implementation project(':kdux-android')
-  
-  kapt project(":kdux-processor")
+  publishProjects.each { dep ->
+    implementation project(":${dep}")
+  }
 }

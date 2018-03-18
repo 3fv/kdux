@@ -46,15 +46,15 @@ object StoreContext {
  * Single updater callback instead of getter - returns whole state
  */
 inline fun <reified T : State> observe(
-  crossinline updater: StoreObserverUpdater<T, T>
+  crossinline updater: StoreUpdateHandler<T, T>
 ): StoreObserver<T, T> = StoreContext.store.observe(updater, { state: T -> state })
 
 /**
  * Shortcut to observe
  */
 inline fun <reified R,reified T : State> observe(
-  crossinline updater: StoreObserverUpdater<R, T>,
-  crossinline getter: StoreObserverGetter<R, T>
+  crossinline updater: StoreUpdateHandler<R, T>,
+  crossinline getter: StoreSelector<R, T>
 ): StoreObserver<R, T> = StoreContext.store.observe(updater, getter)
 
 
@@ -74,3 +74,70 @@ inline fun <reified A: Actions<*>> actions() = StoreContext.store.getActions<A>(
  * Get actions
  */
 inline fun <reified A: Actions<*>> getActions() = StoreContext.store.getActions<A>()
+
+
+/**
+ * Builder for observations
+ */
+class StoreObserversBuilder {
+
+  /**
+   * Keep all builders handy
+   */
+  val observerBuilders = mutableListOf<StoreObserverBuilder<*,*>>()
+
+  /**
+   * Build final observers
+   */
+  internal fun build() = StoreObservers(*observerBuilders.map { it.build() }.toTypedArray())
+
+  @Suppress("UNCHECKED_CAST")
+  inline fun <reified T:State> observe():StoreObserverBuilder<T,T> {
+    val builder = StoreObserverBuilder(T::class,T::class,{ state:T -> state })
+    observerBuilders += builder
+    return builder
+  }
+
+  /**
+   * Add an observer
+   */
+  @Suppress("UNCHECKED_CAST")
+  inline fun <reified R,reified T:State> observe(noinline selector:StateSelector<R,T>):StoreObserverBuilder<R,T> {
+    val builder = StoreObserverBuilder(R::class,T::class,selector)
+    observerBuilders += builder
+    return builder
+  }
+
+
+  /**
+   * Observer builder
+   */
+  inner class StoreObserverBuilder<out R,T:State>(val returnClazz:KClass<*>, val stateClazz:KClass<T>, val selector:StateSelector<R,T>) {
+
+    private var updater:StoreUpdateHandler<*,T>? = null
+
+    infix fun update(updater:StoreUpdateHandler<R,T>) {
+      this.updater = updater
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    internal fun build():StoreObserver<*,*> {
+      requireNotNull(updater, {"You must provide an updater"})
+      return StoreObserver(
+        StoreContext.store,
+        stateClazz,
+        returnClazz,
+        selector as StoreSelector<Any,Any>,
+        updater!! as StoreUpdateHandler<Any, Any>)
+    }
+  }
+}
+
+/**
+ * Rapidly add observers
+ */
+fun observations(body: StoreObserversBuilder.() -> Unit):StoreObservers {
+  val builder = StoreObserversBuilder()
+  builder.body()
+  return builder.build()
+}

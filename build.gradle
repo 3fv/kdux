@@ -4,9 +4,19 @@ buildscript {
   ext {
     VERSION = file("${rootDir}/version.txt").text
     androidToolsVersion = "3.1.0-rc01"
+    androidSupportVersion = "27.1.0"
     kotlinVersion = "1.2.21"
     ankoVersion = "0.10.3"
     binTrayKey = System.getenv("BINTRAY_API_KEY") ?: ""
+  
+    /**
+     * Publish all local
+     */
+  
+    publishProjects = [
+        "kdux-android",
+        "kdux-core"
+    ]
   }
   
   repositories {
@@ -24,13 +34,8 @@ buildscript {
 }
 
 /**
- * Publish all local
+ * Publish install all
  */
-
-def publishProjects = ["kdux-android",
-                       "kdux-core",
-                       "kdux-processor"]
-
 task publishAllLocal() {
   doLast {
     println("All published")
@@ -41,6 +46,10 @@ task installAllLocal() {
   doLast {
     println("All installed")
   }
+}
+
+task installLocal() {
+  dependsOn publishAllLocal, installAllLocal
 }
 
 
@@ -91,13 +100,13 @@ allprojects {currentProject ->
     apply plugin: 'kotlin-kapt'
   }
   
-  
-  
+  // KOTLIN
   kotlin {
     experimental { coroutines 'enable' }
   }
   
   
+  // PUBLISHING
   if (publishProjects.contains(currentProject.name)) {
     apply plugin: 'com.jfrog.bintray'
     
@@ -136,7 +145,6 @@ allprojects {currentProject ->
     implementation(
         "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion",
         "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion",
-        "org.jetbrains.kotlinx:kotlinx-collections-immutable:0.1",
         "io.arrow-kt:arrow-core:${arrowVersion}",
         "io.arrow-kt:arrow-typeclasses:${arrowVersion}",
         "io.arrow-kt:arrow-instances:${arrowVersion}",

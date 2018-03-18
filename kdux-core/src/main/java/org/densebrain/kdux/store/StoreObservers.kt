@@ -10,4 +10,7 @@ class StoreObservers(vararg observers:StoreObserver<*,*>) {
   fun attach() = observers.forEach { it.attach() }
 
   fun detach() = observers.forEach { it.detach() }
+
+
 }
+
