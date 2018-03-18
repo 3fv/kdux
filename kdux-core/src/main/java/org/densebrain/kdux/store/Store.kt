@@ -33,7 +33,7 @@ open class Store(
   /**
    * Observers to the store
    */
-  private val observers = LinkedHashSet<StoreObserver<*, *>>()
+  private val observers = LinkedHashSet<StoreObserver<*>>()
 
   /**
    * Internal map of all leafs
@@ -112,7 +112,7 @@ open class Store(
    */
   @Synchronized
   private fun update(rootState: RootState) {
-    lateinit var observers: List<StoreObserver<*, *>>
+    lateinit var observers: List<StoreObserver<*>>
     synchronized(this.observers) {
       observers = this.observers.toList()
     }
@@ -123,7 +123,7 @@ open class Store(
   /**
    * Remove an observer
    */
-  fun removeObserver(observer: StoreObserver<*, *>) {
+  fun removeObserver(observer: StoreObserver<*>) {
     synchronized(observers) {
       observers.remove(observer)
     }
@@ -132,7 +132,7 @@ open class Store(
   /**
    * Add an observer
    */
-  fun <T: State, R> addObserver(observer: StoreObserver<T,R>): StoreObserver<T,R> {
+  fun <R> addObserver(observer: StoreObserver<R>): StoreObserver<R> {
     synchronized(observers) {
       if (!observers.contains(observer))
         observers.add(observer)
@@ -144,7 +144,7 @@ open class Store(
   /**
    * Is observer attached
    */
-  fun isObserverAttached(observer: StoreObserver<*, *>): Boolean {
+  fun isObserverAttached(observer: StoreObserver<*>): Boolean {
     synchronized(observers) {
       return observers.contains(observer)
     }
@@ -154,14 +154,14 @@ open class Store(
    * Simplified observer creation
    */
   inline fun <reified T: State, reified R> observe(
-    crossinline updater: StoreUpdateHandler<T,R>,
+    crossinline updater: StoreUpdateHandler<R>,
     crossinline getter: StoreSelector<T,R> = { state:T -> state as R }
-  ): StoreObserver<T,R> = addObserver(StoreObserver(
+  ): StoreObserver<R> = addObserver(DefaultStoreObserver(
     this,
     T::class,
     R::class,
     { state: T -> getter(state) },
-    { newValue: R, oldValue: R?, state: T -> updater(newValue, oldValue, state) }
+    { newValue: R, oldValue: R? -> updater(newValue, oldValue) }
   ))
 
 

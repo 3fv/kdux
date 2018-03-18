@@ -11,7 +11,7 @@ class ExampleActions : AbstractActions<ExampleState>() {
 
 
   fun doStuff(count:Int) = reducer { state ->
-    state
+    state.copy(count = count)
   }
 
 }

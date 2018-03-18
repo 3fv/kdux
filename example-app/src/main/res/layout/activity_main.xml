@@ -23,6 +23,16 @@
         android:text="0"
         app:layout_constraintBottom_toTopOf="@id/incrementer"
         app:layout_constraintLeft_toRightOf="@id/counter"
+        app:layout_constraintRight_toLeftOf="@id/counter3"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/counter3"
+        android:text="0"
+        app:layout_constraintBottom_toTopOf="@id/incrementer"
+        app:layout_constraintLeft_toRightOf="@id/counter2"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 

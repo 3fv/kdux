@@ -2,4 +2,4 @@ package org.densebrain.kdux.examplelib.store
 
 import org.densebrain.kdux.store.State
 
-class ExampleState : State
+data class ExampleState(val count:Int = 0) : State

@@ -17,25 +17,33 @@ class MainActivity : AppCompatActivity() {
 
   // EXAMPLE NOT USED
   private var countObserver = observe<ExampleState,Int>(
-    { value, _, _ -> (contentView as View).counter.text = value.toString() },
+    { value, _ -> (contentView as View).counter.text = value.toString() },
     { state -> state.count }
   )
 
   // EXAMPLE NOT USED
   private var countObserver2 = observe<ExampleState>(
-    { value, _, _ -> (contentView as View).counter2.text = value.count2.toString() }
+    { value, _ -> (contentView as View).counter2.text = value.count2.toString() }
   )
 
   // EXAMPLE USED
   private val observers = observations {
     observe<ExampleState,Int> { state -> state.count }
-      .update { value, _, _ ->
+      .update { value, _ ->
         (contentView as View).counter.text = value.toString()
       }
 
-    observe<ExampleState>().update({ value, _, _ ->
+    observe<ExampleState>().update({ value, _ ->
       (contentView as View).counter2.text = value.count2.toString()
     })
+
+    observeComplex<Int> {
+      val exampleState:ExampleState = get()
+
+      exampleState.count + exampleState.count2
+    } update { newValue, _ ->
+      contentView?.counter3?.text = newValue.toString()
+    }
   }
 
   /**
