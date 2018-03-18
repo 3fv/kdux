@@ -16,7 +16,7 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
 class MainActivity : AppCompatActivity() {
 
   // EXAMPLE NOT USED
-  private var countObserver = observe<Int, ExampleState>(
+  private var countObserver = observe<ExampleState,Int>(
     { value, _, _ -> (contentView as View).counter.text = value.toString() },
     { state -> state.count }
   )
@@ -28,7 +28,7 @@ class MainActivity : AppCompatActivity() {
 
   // EXAMPLE USED
   private val observers = observations {
-    observe<Int, ExampleState> { state -> state.count }
+    observe<ExampleState,Int> { state -> state.count }
       .update { value, _, _ ->
         (contentView as View).counter.text = value.toString()
       }

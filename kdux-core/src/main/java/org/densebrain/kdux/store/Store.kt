@@ -17,7 +17,7 @@ typealias PendingActionReducer = Pair<Actions<*>, Reducer<*>>
  */
 typealias RootState = Map<KClass<*>, State>
 
-typealias StateSelector<R,T> = (state:T) -> R
+typealias StateSelector<T,R> = (state:T) -> R
 
 open class Store(
   vararg actionClazzes: KClass<*>
@@ -132,7 +132,7 @@ open class Store(
   /**
    * Add an observer
    */
-  fun <T: State, R> addObserver(observer: StoreObserver<R, T>): StoreObserver<R, T> {
+  fun <T: State, R> addObserver(observer: StoreObserver<T,R>): StoreObserver<T,R> {
     synchronized(observers) {
       if (!observers.contains(observer))
         observers.add(observer)
@@ -154,9 +154,9 @@ open class Store(
    * Simplified observer creation
    */
   inline fun <reified T: State, reified R> observe(
-    crossinline updater: StoreUpdateHandler<R, T>,
-    crossinline getter: StoreSelector<R, T> = { state:T -> state as R }
-  ): StoreObserver<R, T> = addObserver(StoreObserver<R, T>(
+    crossinline updater: StoreUpdateHandler<T,R>,
+    crossinline getter: StoreSelector<T,R> = { state:T -> state as R }
+  ): StoreObserver<T,R> = addObserver(StoreObserver(
     this,
     T::class,
     R::class,

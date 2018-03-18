@@ -52,10 +52,10 @@ inline fun <reified T : State> observe(
 /**
  * Shortcut to observe
  */
-inline fun <reified R,reified T : State> observe(
-  crossinline updater: StoreUpdateHandler<R, T>,
-  crossinline getter: StoreSelector<R, T>
-): StoreObserver<R, T> = StoreContext.store.observe(updater, getter)
+inline fun <reified T : State,reified R> observe(
+  crossinline updater: StoreUpdateHandler<T,R>,
+  crossinline getter: StoreSelector<T,R>
+): StoreObserver<T,R> = StoreContext.store.observe(updater, getter)
 
 
 /**
@@ -102,7 +102,7 @@ class StoreObserversBuilder {
    * Add an observer
    */
   @Suppress("UNCHECKED_CAST")
-  inline fun <reified R,reified T:State> observe(noinline selector:StateSelector<R,T>):StoreObserverBuilder<R,T> {
+  inline fun <reified T:State,reified R> observe(noinline selector:StateSelector<T,R>):StoreObserverBuilder<T,R> {
     val builder = StoreObserverBuilder(R::class,T::class,selector)
     observerBuilders += builder
     return builder
@@ -112,11 +112,11 @@ class StoreObserversBuilder {
   /**
    * Observer builder
    */
-  inner class StoreObserverBuilder<out R,T:State>(val returnClazz:KClass<*>, val stateClazz:KClass<T>, val selector:StateSelector<R,T>) {
+  inner class StoreObserverBuilder<T:State,out R>(val returnClazz:KClass<*>, val stateClazz:KClass<T>, val selector:StateSelector<T,R>) {
 
-    private var updater:StoreUpdateHandler<*,T>? = null
+    private var updater:StoreUpdateHandler<T,*>? = null
 
-    infix fun update(updater:StoreUpdateHandler<R,T>) {
+    infix fun update(updater:StoreUpdateHandler<T,R>) {
       this.updater = updater
     }
 

@@ -4,16 +4,16 @@ import org.slf4j.LoggerFactory
 import java.io.Closeable
 import kotlin.reflect.KClass
 
-typealias StoreUpdateHandler<R,T> = (newValue:R, oldValue:R?, state:T) -> Unit
+typealias StoreUpdateHandler<T,R> = (newValue:R, oldValue:R?, state:T) -> Unit
 
-typealias StoreSelector<R,T> = (state:T) -> R
+typealias StoreSelector<T,R> = (state:T) -> R
 
-class StoreObserver<R,T: State>  (
+class StoreObserver<T: State,R>  (
   private val store: Store,
   private val stateKlazz:KClass<T>,
   private val returnKlazz:KClass<*>,
-  private val getter: StoreSelector<R, T>,
-  private val updater: StoreUpdateHandler<R, T>
+  private val getter: StoreSelector<T,R>,
+  private val updater: StoreUpdateHandler<T,R>
 ) : Closeable {
 
   companion object {
@@ -55,7 +55,7 @@ class StoreObserver<R,T: State>  (
   /**
    * Clear last value and force update (not on scheduler)
    */
-  fun forceUpdate(): StoreObserver<R, T> {
+  fun forceUpdate(): StoreObserver<T,R> {
     lastValue = null
     run(store.getRootState())
     return this
@@ -64,7 +64,7 @@ class StoreObserver<R,T: State>  (
   /**
    * If not currently attached then attach to the store
    */
-  fun attach(doUpdate:Boolean = true): StoreObserver<R, T> {
+  fun attach(doUpdate:Boolean = true): StoreObserver<T,R> {
     store.addObserver(this)
 
     return if (doUpdate) forceUpdate() else this
@@ -73,7 +73,7 @@ class StoreObserver<R,T: State>  (
   /**
    * Detach - synonym to close
    */
-  fun detach(): StoreObserver<R, T> {
+  fun detach(): StoreObserver<T,R> {
     store.removeObserver(this)
     return this
   }
