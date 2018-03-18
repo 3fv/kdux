@@ -188,3 +188,23 @@ fun observations(body: StoreObserversBuilder.() -> Unit): StoreObservers {
   builder.body()
   return builder.build()
 }
+
+
+/**
+ * Simple value selector
+ */
+inline fun <reified T : State, reified R> value(selector:StateSelector<T,R>):R {
+  val store = StoreContext.store
+  val state = store.getLeafState(T::class)
+  return selector(state)
+}
+
+/**
+ * Complex value selector
+ */
+inline fun <reified R> valueComplex(selector:ComplexStateSelector<R>):R {
+  val store = StoreContext.store
+  val context = ComplexStateSelectorContext(store,null)
+
+  return context.selector()
+}
