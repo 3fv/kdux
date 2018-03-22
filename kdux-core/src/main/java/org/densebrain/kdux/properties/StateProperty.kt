@@ -14,7 +14,6 @@ class StateProperty<T:State, out R>(
   private val returnClazz:KClass<*>,
   private val selector:StateSelector<T,R>
 ) {
-
   operator fun getValue(thisRef: Any?, prop: KProperty<*>) =
     selector(StoreContext.store.getLeafState(stateClazz))
 }
