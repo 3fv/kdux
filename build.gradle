@@ -5,7 +5,7 @@ buildscript {
     VERSION = file("${rootDir}/version.txt").text
     androidToolsVersion = "3.1.0-rc01"
     androidSupportVersion = "27.1.0"
-    kotlinVersion = "1.2.21"
+    kotlinVersion = "1.2.31"
     ankoVersion = "0.10.3"
     binTrayKey = System.getenv("BINTRAY_API_KEY") ?: ""
   
@@ -26,10 +26,22 @@ buildscript {
   }
   
   dependencies {
-    classpath "com.android.tools.build:gradle:${androidToolsVersion}"
+    classpath 'com.android.tools.build:gradle:3.1.0'
     classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlinVersion}"
     classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
   
+  }
+}
+
+
+/**
+ * Publish install all
+ */
+task publishAll() {
+  dependsOn(build)
+  
+  doLast {
+    println("All published")
   }
 }
 
@@ -38,13 +50,13 @@ buildscript {
  */
 task publishAllLocal() {
   doLast {
-    println("All published")
+    println("All published locally")
   }
 }
 
 task installAllLocal() {
   doLast {
-    println("All installed")
+    println("All installed locally")
   }
 }
 
@@ -127,6 +139,7 @@ allprojects {currentProject ->
       }
     }
   
+    publishAll.dependsOn(bintrayUpload)
     publishAllLocal.dependsOn(publishToMavenLocal)
     installAllLocal.dependsOn(install)
   }

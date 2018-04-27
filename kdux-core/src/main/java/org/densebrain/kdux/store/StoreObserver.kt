@@ -50,11 +50,11 @@ class DefaultStoreObserver<T : State, R>(
 
     val newValue = getter(leafState)
     if (newValue !== lastValue) {
-      val lastValue = this.lastValue
+      val oldValue = this.lastValue
       this.lastValue = newValue
 
       if (isAttached)
-        updater(newValue, lastValue)
+        updater(newValue, oldValue)
     }
   }
 
