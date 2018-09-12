@@ -1,11 +1,11 @@
 package org.densebrain.kdux.store
 
-import arrow.effects.DeferredKW
+import arrow.effects.DeferredK
 
 class DefaultStoreUpdateScheduler : StoreUpdateScheduler {
 
   override fun schedule(update: StoreUpdate) {
-    DeferredKW {
+    DeferredK {
       update.run()
     }
   }

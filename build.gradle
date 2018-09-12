@@ -3,9 +3,9 @@
 buildscript {
   ext {
     VERSION = file("${rootDir}/version.txt").text
-    androidToolsVersion = "3.1.0"
+    androidToolsVersion = "3.2.0-rc02"
     androidSupportVersion = "27.1.1"
-    kotlinVersion = "1.2.31"
+    kotlinVersion = "1.2.61"
     ankoVersion = "0.10.3"
     binTrayKey = System.getenv("BINTRAY_API_KEY") ?: ""
   
@@ -38,7 +38,7 @@ buildscript {
  */
 task publishAll() {
   dependsOn(build)
-  
+
   doLast {
     println("All published")
   }
@@ -75,7 +75,7 @@ allprojects {currentProject ->
   
   buildscript {
     ext {
-      arrowVersion        = "0.6.1"
+      arrowVersion        = "0.7.3"
       slf4jVersion        = "1.7.25"
       kotlinPoetVersion   = "0.7.0"
       googleAutoVersion   = "1.0-rc4"
@@ -159,7 +159,7 @@ allprojects {currentProject ->
         "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion",
         "io.arrow-kt:arrow-core:${arrowVersion}",
         "io.arrow-kt:arrow-typeclasses:${arrowVersion}",
-        "io.arrow-kt:arrow-instances:${arrowVersion}",
+        //"io.arrow-kt:arrow-instances:${arrowVersion}",
         "io.arrow-kt:arrow-data:${arrowVersion}",
         "io.arrow-kt:arrow-syntax:${arrowVersion}",
         "io.arrow-kt:arrow-effects-kotlinx-coroutines:${arrowVersion}",

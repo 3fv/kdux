@@ -2,7 +2,6 @@ package org.densebrain.kdux.store
 
 import org.densebrain.kdux.reducers.Reducer
 import org.densebrain.kdux.actions.Actions
-import arrow.effects.DeferredKW
 import java.util.concurrent.ConcurrentLinkedDeque
 import kotlin.collections.LinkedHashSet
 import kotlin.reflect.KClass
@@ -91,9 +90,10 @@ open class Store(
    * Schedule processing
    */
   private fun scheduleProcess() {
-    DeferredKW {
-      process()
-    }
+    process()
+//    DeferredK {
+//
+//    }
   }
 
   /**
