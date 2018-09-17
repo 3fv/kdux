@@ -6,7 +6,7 @@ buildscript {
     androidToolsVersion = "3.2.0-rc02"
     androidSupportVersion = "27.1.1"
     kotlinVersion = "1.2.61"
-    ankoVersion = "0.10.3"
+    ankoVersion = "0.10.5"
     binTrayKey = System.getenv("BINTRAY_API_KEY") ?: ""
   
     /**
