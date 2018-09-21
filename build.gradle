@@ -3,7 +3,7 @@
 buildscript {
   ext {
     VERSION = file("${rootDir}/version.txt").text
-    androidToolsVersion = "3.2.0-rc02"
+    androidToolsVersion = "3.2.0-rc03"
     androidSupportVersion = "27.1.1"
     kotlinVersion = "1.2.61"
     ankoVersion = "0.10.5"
