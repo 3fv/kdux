@@ -1,49 +1,82 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  xmlns:tools="http://schemas.android.com/tools">
+
+  <data>
+
+    <import type="androidx.lifecycle.LiveData" />
+
+    <import type="org.densebrain.kdux.example.store.ExampleState" />
+
+    <variable
+      name="actions"
+      type="org.densebrain.kdux.example.store.ExampleActions" />
+
+    <variable
+      name="model"
+      type="LiveData&lt;ExampleState&gt;" />
+  </data>
+
+  <LinearLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical"
     tools:context="org.densebrain.kdux.example.MainActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/counter"
-        android:text="0"
-        app:layout_constraintBottom_toTopOf="@id/incrementer"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toLeftOf="@id/counter2"
-        app:layout_constraintTop_toTopOf="parent" />
+    <LinearLayout
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:orientation="horizontal">
 
-    <TextView
-        android:layout_width="wrap_content"
+      <LinearLayout
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:id="@+id/counter2"
-        android:text="0"
-        app:layout_constraintBottom_toTopOf="@id/incrementer"
-        app:layout_constraintLeft_toRightOf="@id/counter"
-        app:layout_constraintRight_toLeftOf="@id/counter3"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_weight="10"
+        android:orientation="vertical">
 
-    <TextView
-        android:layout_width="wrap_content"
+        <TextView
+          android:id="@+id/counter"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="@{String.valueOf(model.count)}" />
+
+        <Button
+          android:id="@+id/incrementer"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:onClick="@{() -> actions.incrementCounter(1)}"
+          android:text="@string/increment" />
+      </LinearLayout>
+
+      <LinearLayout
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_weight="10"
+        android:orientation="vertical">
+
+        <TextView
+          android:id="@+id/counter2"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="@{String.valueOf(model.count2)}" />
+
+        <Button
+          android:id="@+id/incrementer2"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:onClick="@{() -> actions.incrementCounter2(10)}"
+          android:text="@string/increment" />
+      </LinearLayout>
+
+      <TextView
         android:id="@+id/counter3"
-        android:text="0"
-        app:layout_constraintBottom_toTopOf="@id/incrementer"
-        app:layout_constraintLeft_toRightOf="@id/counter2"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/incrementer"
-        android:text="@string/increment"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/counter"/>
+        android:text="@{String.valueOf(model.count + model.count2)}" />
+    </LinearLayout>
 
-</android.support.constraint.ConstraintLayout>
+
+  </LinearLayout>
+</layout>

@@ -3,10 +3,6 @@
 buildscript {
   ext {
     VERSION = file("${rootDir}/version.txt").text
-    androidToolsVersion = "3.2.0-rc03"
-    androidSupportVersion = "27.1.1"
-    kotlinVersion = "1.2.61"
-    ankoVersion = "0.10.5"
     binTrayKey = System.getenv("BINTRAY_API_KEY") ?: ""
   
     /**
@@ -18,6 +14,8 @@ buildscript {
         "kdux-core"
     ]
   }
+
+  apply from: "${rootDir}/gradle/versions.gradle"
   
   repositories {
     google()
@@ -26,9 +24,9 @@ buildscript {
   }
   
   dependencies {
-    classpath "com.android.tools.build:gradle:${androidToolsVersion}"
-    classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlinVersion}"
-    classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
+    classpath "com.android.tools.build:gradle:${Versions.androidGradle}"
+    classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${Versions.kotlin}"
+    classpath "com.jfrog.bintray.gradle:gradle-bintray-plugin:${Versions.bintray}"
   
   }
 }
@@ -74,18 +72,8 @@ allprojects {currentProject ->
   currentProject.version = VERSION
   
   buildscript {
-    ext {
-      arrowVersion        = "0.7.3"
-      slf4jVersion        = "1.7.25"
-      kotlinPoetVersion   = "0.7.0"
-      googleAutoVersion   = "1.0-rc4"
-      junitVersion        = "4.12"
-      
-      SOURCE_VERSION      = "1.8"
-      MIN_SDK_VERSION     = 24
-      TARGET_SDK_VERSION  = 27
-      COMPILE_SDK_VERSION = 27
-    }
+    apply from: "${rootDir}/gradle/versions.gradle"
+
   }
  
   // PLUGINS
@@ -97,17 +85,17 @@ allprojects {currentProject ->
     apply plugin: 'java'
     apply plugin: 'kotlin'
     
-    sourceCompatibility = SOURCE_VERSION
-    targetCompatibility = SOURCE_VERSION
+    sourceCompatibility = Versions.SOURCE_VERSION
+    targetCompatibility = Versions.SOURCE_VERSION
     
   } else if (currentProject.name == "kdux-android") {
     apply plugin: 'com.android.library'
     apply plugin: 'kotlin-android'
-    apply plugin: 'kotlin-android-extensions'
+    //apply plugin: 'kotlin-android-extensions'
   } else {
     apply plugin: 'com.android.application'
     apply plugin: 'kotlin-android'
-    apply plugin: 'kotlin-android-extensions'
+    //apply plugin: 'kotlin-android-extensions'
     apply plugin: 'kotlin-kapt'
   }
   
@@ -133,7 +121,7 @@ allprojects {currentProject ->
         vcsUrl = 'https://github.com/jglanz/kdux.git'
         version {
           name = VERSION
-          released = new Date()
+          released = new java.util.Date()
         }
       }
     }
@@ -148,25 +136,21 @@ allprojects {currentProject ->
     google()
     jcenter()
     mavenCentral()
-    maven {
-      url "http://dl.bintray.com/kotlin/kotlinx"
-    }
   }
 
   dependencies {
     implementation(
-        "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion",
-        "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion",
-        "io.arrow-kt:arrow-core:${arrowVersion}",
-        "io.arrow-kt:arrow-typeclasses:${arrowVersion}",
-        //"io.arrow-kt:arrow-instances:${arrowVersion}",
-        "io.arrow-kt:arrow-data:${arrowVersion}",
-        "io.arrow-kt:arrow-syntax:${arrowVersion}",
-        "io.arrow-kt:arrow-effects-kotlinx-coroutines:${arrowVersion}",
-        "org.slf4j:slf4j-api:${slf4jVersion}"
+        "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${Versions.kotlin}",
+        "org.jetbrains.kotlin:kotlin-reflect:${Versions.kotlin}",
+        "io.arrow-kt:arrow-core:${Versions.arrow}",
+        "io.arrow-kt:arrow-typeclasses:${Versions.arrow}",
+        "io.arrow-kt:arrow-data:${Versions.arrow}",
+        "io.arrow-kt:arrow-syntax:${Versions.arrow}",
+        "io.arrow-kt:arrow-effects-kotlinx-coroutines:${Versions.arrow}",
+        "org.slf4j:slf4j-api:${Versions.slf4j}"
     )
   
-    testImplementation("junit:junit:${junitVersion}")
+    //testImplementation("junit:junit:${junitVersion}")
   }
 }
 

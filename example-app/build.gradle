@@ -1,9 +1,13 @@
+buildscript {
+  apply from: "${rootDir}/gradle/versions.gradle"
+}
+
 android {
-  compileSdkVersion COMPILE_SDK_VERSION
+  compileSdkVersion Versions.COMPILE_SDK_VERSION
   defaultConfig {
     applicationId "org.densebrain.kdux.example"
-    minSdkVersion MIN_SDK_VERSION
-    targetSdkVersion TARGET_SDK_VERSION
+    minSdkVersion Versions.MIN_SDK_VERSION
+    targetSdkVersion Versions.TARGET_SDK_VERSION
     versionCode 1
     versionName "1.0"
     testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -14,25 +18,24 @@ android {
       proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
     }
   }
+
+  dataBinding {
+    enabled = true
+  }
 }
 
 dependencies {
   implementation(
-      "com.android.support:appcompat-v7:${androidSupportVersion}",
-      'com.android.support.constraint:constraint-layout:1.0.2',
-       "org.jetbrains.anko:anko-sdk25:$ankoVersion",
-       "org.jetbrains.anko:anko-sdk25-coroutines:$ankoVersion",
-       "org.jetbrains.anko:anko-appcompat-v7:$ankoVersion",
-       "org.jetbrains.anko:anko-appcompat-v7-coroutines:$ankoVersion",
-       "org.jetbrains.anko:anko-sqlite:$ankoVersion",
-       "org.jetbrains.anko:anko-commons:$ankoVersion"
+    "androidx.lifecycle:lifecycle-extensions:${Versions.androidLifecycle}",
+    "androidx.lifecycle:lifecycle-common-java8:${Versions.androidLifecycle}",
+    "com.android.support:appcompat-v7:${Versions.androidSupport}"
   )
-  
+
   androidTestImplementation(
-      'com.android.support.test:runner:1.0.1',
-      'com.android.support.test.espresso:espresso-core:3.0.1'
+    "com.android.support.test:runner:${Versions.androidTestRunner}",
+    "com.android.support.test.espresso:espresso-core:${Versions.androidTest}"
   )
-  
+
   publishProjects.each { dep ->
     implementation project(":${dep}")
   }

@@ -126,10 +126,11 @@ class StoreObserversBuilder {
   inner class DefaultStoreObserverBuilder<T : State, R>(
     val returnClazz: KClass<*>,
     val stateClazz: KClass<T>,
-    val selector: StateSelector<T, R>
+    val selector: StateSelector<T, R>,
+    private var updater: StoreUpdateHandler<R>? = null
   ) : StoreObserverBuilder<R> {
 
-    private var updater: StoreUpdateHandler<R>? = null
+
 
     infix fun update(updater: StoreUpdateHandler<R>) {
       this.updater = updater
