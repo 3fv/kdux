@@ -31,6 +31,13 @@ buildscript {
   }
 }
 
+if (tasks.getByName("build") == null) {
+  task build() {
+    doLast {
+      println("Built")
+    }
+  }
+}
 /**
  * Publish install all
  */
@@ -165,6 +172,7 @@ allprojects {currentProject ->
       }
     }
   
+    build.dependsOn(build)
     publishAll.dependsOn(bintrayUpload)
     publishAllLocal.dependsOn(publishToMavenLocal)
     installAllLocal.dependsOn(install)
