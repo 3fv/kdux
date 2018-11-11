@@ -56,7 +56,7 @@ open class AndroidStoreObserver<T : State, R>(
   private val androidStore
     get() = store as AndroidStore
 
-  private val debounceHandler = Handler(debounceThread.looper)
+  private var debounceHandler:Handler? = null
 
   /**
    * Observer id for tracking
@@ -106,10 +106,14 @@ open class AndroidStoreObserver<T : State, R>(
     }
   }
 
+  @Synchronized
   private fun scheduleUpdate(update:DebounceUpdate) {
+    if (debounceHandler == null) {
+      debounceHandler = Handler(debounceThread.looper)
+    }
     //Log.i(TAG, "Schedule (${id}) delay=${update.scheduleDelay}", Exception("stack"))
-    debounceHandler.removeCallbacksAndMessages(null)
-    debounceHandler.postDelayed(update, update.scheduleDelay)
+    debounceHandler!!.removeCallbacksAndMessages(null)
+    debounceHandler!!.postDelayed(update, update.scheduleDelay)
   }
 
   private interface Update : Runnable {
