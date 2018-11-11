@@ -2,6 +2,7 @@ package org.densebrain.kdux.store
 
 import org.densebrain.kdux.reducers.Reducer
 import org.densebrain.kdux.actions.Actions
+import org.densebrain.kdux.util.shallowEquals
 import java.util.concurrent.ConcurrentLinkedDeque
 import kotlin.collections.LinkedHashSet
 import kotlin.reflect.KClass
@@ -32,7 +33,7 @@ open class Store(
   /**
    * Observers to the store
    */
-  private val observers = LinkedHashSet<StoreObserver<*>>()
+  protected val observers = LinkedHashSet<StoreObserver<*>>()
 
   /**
    * Internal map of all leafs
@@ -47,77 +48,46 @@ open class Store(
   /**
    * Pending reducers
    */
-  private val pendingReducers = ConcurrentLinkedDeque<PendingActionReducer>()
+  //private val pendingReducers = ConcurrentLinkedDeque<PendingActionReducer>()
 
   /**
    * Process pending reducers
    */
+  @Suppress("UNCHECKED_CAST")
   @Synchronized
-  private fun process() {
-
-    // GET REDUCERS AND CLEAR PENDING
-    val pendingReducers = run {
-      lateinit var reducers: List<PendingActionReducer>
-      synchronized(pendingReducers) {
-        reducers = arrayListOf(*pendingReducers.toTypedArray())
-        pendingReducers.clear()
-      }
-      return@run reducers
-    }
+  private fun process(actions: Actions<*>, reducer: Reducer<*>) {
 
     // RUN REDUCERS
     val newRootState = rootState.toMutableMap()
 
-    val reducersByState = pendingReducers.groupBy { it.first.stateType }
-    reducersByState
-      .entries
-      .forEach { (stateType, reducers) ->
-        var state = newRootState[stateType]!!
-        for (reducer in reducers) {
-          @Suppress("UNCHECKED_CAST")
-          state = (reducer.second as Reducer<Any>).handle(state) as State
-        }
+    val stateType = actions.stateType
+    val state = newRootState[stateType]!!
+    val newState = (reducer as Reducer<Any>).handle(state) as State
 
-        newRootState[stateType] = state
-      }
-
-    rootState = newRootState.toMap()
-
-    updateScheduler.schedule(DefaultStoreUpdate(newRootState))
-  }
-
-  /**
-   * Schedule processing
-   */
-  private fun scheduleProcess() {
-    process()
-//    DeferredK {
-//
-//    }
-  }
-
-  /**
-   * Push pending action reducer
-   */
-  private fun push(actions: Actions<*>, reducer: Reducer<*>) {
-    synchronized(pendingReducers) {
-      pendingReducers.push(Pair(actions, reducer))
+    if (state !== newState && !shallowEquals(stateType as KClass<State>,state ,newState )) {
+      newRootState[stateType] = newState
+      rootState = newRootState.toMap()
+      updateScheduler.schedule(makeStoreUpdate(newRootState))
     }
-
-    scheduleProcess()
   }
+
+  open fun makeStoreUpdate(rootState:RootState):StoreUpdate {
+    return DefaultStoreUpdate(rootState)
+  }
+
 
   /**
    * Push updates to observers
    */
-  @Synchronized
-  private fun update(rootState: RootState) {
-    lateinit var observers: List<StoreObserver<*>>
+  protected open fun update(rootState: RootState) {
+    lateinit var observers: Set<StoreObserver<*>>
     synchronized(this.observers) {
-      observers = this.observers.toList()
+      observers = this.observers.toSet()
     }
 
-    observers.forEach { it.run(rootState) }
+    observers.forEach {
+      it.run(rootState)
+    }
   }
 
   /**
@@ -180,8 +150,7 @@ open class Store(
    * Dispatch an action
    */
   fun dispatch(actions: Actions<*>, reducer: Reducer<*>) {
-    push(actions, reducer)
-    scheduleProcess()
+    process(actions, reducer)
   }
 
   /**
@@ -228,14 +197,19 @@ open class Store(
 
     rootState = newRootState.toMap()
 
+
   }
 
   /**
    * Default implementation of store update
    */
-  private inner class DefaultStoreUpdate(val rootState: RootState) : StoreUpdate {
+  protected inner class DefaultStoreUpdate(private val rootState: RootState) : StoreUpdate {
+    override val store: Store
+      get() = this@Store
+
     override fun run() {
       update(rootState)
     }
   }
+
 }

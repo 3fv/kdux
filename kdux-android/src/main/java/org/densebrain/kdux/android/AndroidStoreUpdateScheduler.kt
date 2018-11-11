@@ -4,18 +4,40 @@ import org.densebrain.kdux.store.StoreUpdate
 import org.densebrain.kdux.store.StoreUpdateScheduler
 import android.content.Context
 import android.os.Handler
+import android.os.HandlerThread
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.OnLifecycleEvent
+import androidx.lifecycle.ProcessLifecycleOwner
 
-class AndroidStoreUpdateScheduler(context: Context) : StoreUpdateScheduler {
+class AndroidStoreUpdateScheduler(context: Context) : StoreUpdateScheduler, LifecycleObserver {
 
-  private val mainHandler = Handler(context.mainLooper)
+  private var updateThread:HandlerThread? = null
+  private var updateHandler:Handler? = null
 
   override fun schedule(update: StoreUpdate) {
-    mainHandler.post(StoreUpdateRunner(update))
+    updateHandler?.post(update)
   }
 
-  private class StoreUpdateRunner(val update: StoreUpdate) : Runnable {
-    override fun run() {
-      update.run()
+  @OnLifecycleEvent(Lifecycle.Event.ON_START)
+  fun onStart() {
+    updateThread = HandlerThread(AndroidStoreUpdateScheduler::class.java.name).apply {
+      start()
     }
+    updateHandler = Handler(updateThread!!.looper)
+
   }
+
+  @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
+  fun onStop() {
+    updateThread?.quitSafely()
+  }
+
+  init {
+    ProcessLifecycleOwner.get().lifecycle.addObserver(this)
+  }
+
+
+
+
 }

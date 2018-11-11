@@ -105,6 +105,45 @@ allprojects {currentProject ->
   }
   
   
+  configurations.all {
+    resolutionStrategy {
+      exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jre7'
+      exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jre8'
+      exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk7'
+      exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk7'
+      
+      force(
+        "org.jetbrains.kotlin:kotlin-stdlib:${Versions.kotlin}",
+        "org.jetbrains.kotlin:kotlin-stdlib-jre7:${Versions.kotlin}",
+        "org.jetbrains.kotlin:kotlin-stdlib-jre8:${Versions.kotlin}",
+        "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${Versions.kotlin}",
+        "org.jetbrains.kotlin:kotlin-reflect:${Versions.kotlin}",
+        
+        "androidx.test:core:${Versions.androidTestCore}",
+        
+        // AndroidJUnitRunner and JUnit Rules
+        "androidx.test:runner:${Versions.androidTest}",
+        "androidx.test:rules:${Versions.androidTest}",
+        
+        // Assertions
+        "androidx.test.ext:junit:${Versions.androidTestExt}",
+        "androidx.test.ext:truth:${Versions.androidTestExt}",
+        "com.google.truth:truth:${Versions.googleTruth}",
+        
+        // Espresso dependencies
+        "androidx.test.espresso:espresso-core:${Versions.androidTestEspresso}",
+        "androidx.test.espresso:espresso-contrib:${Versions.androidTestEspresso}",
+        "androidx.test.espresso:espresso-intents:${Versions.androidTestEspresso}",
+        "androidx.test.espresso:espresso-accessibility:${Versions.androidTestEspresso}",
+        "androidx.test.espresso:espresso-web:${Versions.androidTestEspresso}",
+        "androidx.test.espresso.idling:idling-concurrent:${Versions.androidTestEspresso}",
+        
+        "androidx.test.espresso:espresso-idling-resource:${Versions.androidTestEspresso}"
+      )
+    }
+  }
+  
+  
   // PUBLISHING
   if (publishProjects.contains(currentProject.name)) {
     apply plugin: 'com.jfrog.bintray'
@@ -141,7 +180,9 @@ allprojects {currentProject ->
   dependencies {
     implementation(
         "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${Versions.kotlin}",
+        "org.jetbrains.kotlin:kotlin-stdlib:${Versions.kotlin}",
         "org.jetbrains.kotlin:kotlin-reflect:${Versions.kotlin}",
+      
         "io.arrow-kt:arrow-core:${Versions.arrow}",
         "io.arrow-kt:arrow-typeclasses:${Versions.arrow}",
         "io.arrow-kt:arrow-data:${Versions.arrow}",

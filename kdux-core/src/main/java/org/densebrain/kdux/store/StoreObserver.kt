@@ -20,12 +20,12 @@ interface StoreObserver<R> {
 /**
  * Default (Simple) observer
  */
-class DefaultStoreObserver<T : State, R>(
-  private val store: Store,
-  private val stateKlazz: KClass<T>,
-  private val returnKlazz: KClass<*>,
-  private val getter: StoreSelector<T, R>,
-  private val updater: StoreUpdateHandler<R>
+open class DefaultStoreObserver<T : State, R>(
+  protected val store: Store,
+  protected val stateKlazz: KClass<T>,
+  protected val returnKlazz: KClass<*>,
+  protected val getter: StoreSelector<T, R>,
+  protected val updater: StoreUpdateHandler<R>
 ) : Closeable, StoreObserver<R> {
 
   companion object {

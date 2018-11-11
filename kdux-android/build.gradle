@@ -10,9 +10,18 @@ android {
     targetSdkVersion Versions.TARGET_SDK_VERSION
     versionCode 1
     versionName "1.0"
+  
+    testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+  
+    // The following argument makes the Android Test Orchestrator run its
+    // "pm clear" command after each test invocation. This command ensures
+    // that the app's state is completely cleared between tests.
+    testInstrumentationRunnerArguments clearPackageData: 'true'
     
-    testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-    
+  }
+  
+  testOptions {
+    execution 'ANDROIDX_TEST_ORCHESTRATOR'
   }
   
   buildTypes {
@@ -24,14 +33,17 @@ android {
   
 }
 
+
+
 dependencies {
   implementation project(":kdux-core")
   
   implementation "androidx.lifecycle:lifecycle-extensions:${Versions.androidLifecycle}"
   implementation "androidx.lifecycle:lifecycle-common-java8:${Versions.androidLifecycle}"
-
-  androidTestImplementation "com.android.support.test:runner:${Versions.androidTestRunner}"
-  androidTestImplementation "com.android.support.test.espresso:espresso-core:${Versions.androidTest}"
+  implementation "androidx.appcompat:appcompat:${Versions.androidAppCompat}"
+  
+  androidTestImplementation "androidx.test:runner:${Versions.androidTest}"
+  androidTestUtil "androidx.test:orchestrator:${Versions.androidTest}"
 }
 
 task sourceJar(type: Jar) {

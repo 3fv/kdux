@@ -79,11 +79,8 @@ inline fun <reified A : Actions<*>> getActions() = StoreContext.store.getActions
 /**
  * Builder for observations
  */
-class StoreObserversBuilder {
+open class StoreObserversBuilder {
 
-  interface StoreObserverBuilder<R> {
-    fun build(): StoreObserver<R>
-  }
 
   /**
    * Keep all builders handy
@@ -93,7 +90,7 @@ class StoreObserversBuilder {
   /**
    * Build final observers
    */
-  internal fun build() = StoreObservers(*observerBuilders.map { it.build() }.toTypedArray())
+  fun build() = StoreObservers(*observerBuilders.map { it.build() }.toTypedArray())
 
   @Suppress("UNCHECKED_CAST")
   inline fun <reified T : State> observe(): DefaultStoreObserverBuilder<T,T> {
@@ -120,64 +117,69 @@ class StoreObserversBuilder {
   }
 
 
-  /**
-   * Observer builder
-   */
-  inner class DefaultStoreObserverBuilder<T : State, R>(
-    val returnClazz: KClass<*>,
-    val stateClazz: KClass<T>,
-    val selector: StateSelector<T, R>,
-    private var updater: StoreUpdateHandler<R>? = null
-  ) : StoreObserverBuilder<R> {
+}
+
+
+/**
+ * Observer builder
+ */
+class DefaultStoreObserverBuilder<T : State, R>(
+  val returnClazz: KClass<*>,
+  val stateClazz: KClass<T>,
+  val selector: StateSelector<T, R>,
+  private var updater: StoreUpdateHandler<R>? = null
+) : StoreObserverBuilder<R> {
 
 
 
-    infix fun update(updater: StoreUpdateHandler<R>) {
-      this.updater = updater
-    }
-
-    @Suppress("UNCHECKED_CAST")
-    override fun build(): StoreObserver<R> {
-      requireNotNull(updater, { "You must provide an updater" })
-      return DefaultStoreObserver(
-        StoreContext.store,
-        stateClazz,
-        returnClazz,
-        selector as StoreSelector<Any, Any>,
-        updater!! as StoreUpdateHandler<Any>
-      ) as StoreObserver<R>
-    }
+  infix fun update(updater: StoreUpdateHandler<R>) {
+    this.updater = updater
   }
 
+  @Suppress("UNCHECKED_CAST")
+  override fun build(): StoreObserver<R> {
+    requireNotNull(updater) { "You must provide an updater" }
+    return DefaultStoreObserver(
+      StoreContext.store,
+      stateClazz,
+      returnClazz,
+      selector as StoreSelector<Any, Any>,
+      updater!! as StoreUpdateHandler<Any>
+    ) as StoreObserver<R>
+  }
+}
+
+interface StoreObserverBuilder<R> {
+  fun build(): StoreObserver<R>
+}
+
+/**
+ * Complex store observer
+ */
+class ComplexStoreObserverBuilder<R>(
+  val returnClazz: KClass<*>,
+  val selector: ComplexStateSelector<R>
+) : StoreObserverBuilder<R> {
 
   /**
-   * Complex store observer
+   * The updater
    */
-  inner class ComplexStoreObserverBuilder<R>(
-    val returnClazz: KClass<*>,
-    val selector: ComplexStateSelector<R>
-  ) : StoreObserverBuilder<R> {
+  private var updater: StoreUpdateHandler<R>? = null
 
-    /**
-     * The updater
-     */
-    private var updater: StoreUpdateHandler<R>? = null
+  /**
+   * Set the updater
+   */
+  infix fun update(updater: StoreUpdateHandler<R>) {
+    this.updater = updater
+  }
 
-    /**
-     * Set the updater
-     */
-    infix fun update(updater: StoreUpdateHandler<R>) {
-      this.updater = updater
-    }
-
-    override fun build(): StoreObserver<R> {
-      requireNotNull(updater, { "You must provide an updater" })
-      return ComplexStoreObserver(
-        StoreContext.store,
-        selector,
-        updater!!
-      )
-    }
+  override fun build(): StoreObserver<R> {
+    requireNotNull(updater, { "You must provide an updater" })
+    return ComplexStoreObserver(
+      StoreContext.store,
+      selector,
+      updater!!
+    )
   }
 }
 
