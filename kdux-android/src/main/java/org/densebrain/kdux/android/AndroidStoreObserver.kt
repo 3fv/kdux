@@ -39,13 +39,20 @@ open class AndroidStoreObserver<T : State, R>(
 
     private val TAG = AndroidStoreObserver::class.java.name
 
-    private val debounceThread = HandlerThread(AndroidStoreObserver::class.java.name).apply {
-      start()
+    private var debounceThread:HandlerThread? = null
+
+
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_START)
+    fun onStart() {
+      debounceThread = HandlerThread(AndroidStoreObserver::class.java.name).apply {
+        start()
+      }
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
     fun onStop() {
-      debounceThread.quitSafely()
+      debounceThread?.quitSafely()
     }
 
     init {
@@ -109,8 +116,10 @@ open class AndroidStoreObserver<T : State, R>(
   @Synchronized
   private fun scheduleUpdate(update:DebounceUpdate) {
     if (debounceHandler == null) {
-      debounceHandler = Handler(debounceThread.looper)
+      val looper = debounceThread?.looper ?: return
+      debounceHandler = Handler(looper)
     }
+
     //Log.i(TAG, "Schedule (${id}) delay=${update.scheduleDelay}", Exception("stack"))
     debounceHandler!!.removeCallbacksAndMessages(null)
     debounceHandler!!.postDelayed(update, update.scheduleDelay)
