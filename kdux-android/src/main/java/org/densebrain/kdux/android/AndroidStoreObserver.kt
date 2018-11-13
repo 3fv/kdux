@@ -7,6 +7,8 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import androidx.lifecycle.ProcessLifecycleOwner
+import arrow.core.Try
+import arrow.core.recover
 import org.densebrain.kdux.store.*
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
@@ -115,14 +117,15 @@ open class AndroidStoreObserver<T : State, R>(
 
   @Synchronized
   private fun scheduleUpdate(update:DebounceUpdate) {
-    if (debounceHandler == null) {
-      val looper = debounceThread?.looper ?: return
-      debounceHandler = Handler(looper)
-    }
+    Try {
+      if (debounceHandler == null) {
+        val looper = debounceThread?.looper ?: return
+        debounceHandler = Handler(looper)
+      }
 
-    //Log.i(TAG, "Schedule (${id}) delay=${update.scheduleDelay}", Exception("stack"))
-    debounceHandler!!.removeCallbacksAndMessages(null)
-    debounceHandler!!.postDelayed(update, update.scheduleDelay)
+      debounceHandler!!.removeCallbacksAndMessages(null)
+      debounceHandler!!.postDelayed(update, update.scheduleDelay)
+    }.recover { ex -> Log.e(TAG,"Unable to schedule update", ex) }
   }
 
   private interface Update : Runnable {
