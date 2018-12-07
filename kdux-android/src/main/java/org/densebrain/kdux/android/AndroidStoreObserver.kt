@@ -10,6 +10,7 @@ import androidx.lifecycle.ProcessLifecycleOwner
 import arrow.core.Try
 import arrow.core.recover
 import org.densebrain.kdux.store.*
+import java.lang.IllegalStateException
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicBoolean
@@ -123,8 +124,22 @@ open class AndroidStoreObserver<T : State, R>(
         debounceHandler = Handler(looper)
       }
 
-      debounceHandler!!.removeCallbacksAndMessages(null)
-      debounceHandler!!.postDelayed(update, update.scheduleDelay)
+      try {
+        debounceHandler!!.removeCallbacksAndMessages(null)
+        debounceHandler!!.postDelayed(update, update.scheduleDelay)
+      } catch (ex:IllegalStateException) {
+
+        // DESTROY OLD DEBOUNCE THREAD
+        Try { debounceThread!!.quitSafely() }
+
+        // NEW THREAD & HANDLER
+        debounceThread = HandlerThread(AndroidStoreObserver::class.java.name).apply {
+          start()
+        }
+        debounceHandler = null
+
+        scheduleUpdate(update)
+      }
     }.recover { ex -> Log.e(TAG,"Unable to schedule update", ex) }
   }
 
