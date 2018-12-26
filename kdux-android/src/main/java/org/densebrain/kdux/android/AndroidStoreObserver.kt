@@ -7,7 +7,9 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import androidx.lifecycle.ProcessLifecycleOwner
+import arrow.core.Try
 import org.densebrain.kdux.store.*
+import java.lang.IllegalStateException
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicBoolean
@@ -41,13 +43,23 @@ open class AndroidStoreObserver<T : State, R>(
 
     private var debounceThread:HandlerThread? = null
 
-
+    @Synchronized
+    private fun startHandlerThread(force:Boolean = false) {
+      if (debounceThread == null || force) {
+        if (debounceThread != null) {
+          Try {
+            debounceThread!!.quitSafely()
+          }
+        }
+        debounceThread = HandlerThread(AndroidStoreObserver::class.java.name).apply {
+          start()
+        }
+      }
+    }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
     fun onStart() {
-      debounceThread = HandlerThread(AndroidStoreObserver::class.java.name).apply {
-        start()
-      }
+      startHandlerThread()
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
@@ -122,7 +134,14 @@ open class AndroidStoreObserver<T : State, R>(
 
     //Log.i(TAG, "Schedule (${id}) delay=${update.scheduleDelay}", Exception("stack"))
     debounceHandler!!.removeCallbacksAndMessages(null)
-    debounceHandler!!.postDelayed(update, update.scheduleDelay)
+    try {
+      debounceHandler!!.postDelayed(update, update.scheduleDelay)
+    } catch (ex:IllegalStateException) {
+      Log.w(TAG,"Debounce handler thread is dead", ex)
+
+      debounceHandler = null
+      startHandlerThread(true)
+    }
   }
 
   private interface Update : Runnable {
