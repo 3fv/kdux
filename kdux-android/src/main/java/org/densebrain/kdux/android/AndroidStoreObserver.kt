@@ -8,6 +8,7 @@ import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import androidx.lifecycle.ProcessLifecycleOwner
 import arrow.core.Try
+import arrow.core.recover
 import org.densebrain.kdux.store.*
 import java.lang.IllegalStateException
 import java.util.*
@@ -127,20 +128,20 @@ open class AndroidStoreObserver<T : State, R>(
 
   @Synchronized
   private fun scheduleUpdate(update:DebounceUpdate) {
-    if (debounceHandler == null) {
-      val looper = debounceThread?.looper ?: return
-      debounceHandler = Handler(looper)
-    }
-
-    //Log.i(TAG, "Schedule (${id}) delay=${update.scheduleDelay}", Exception("stack"))
-    debounceHandler!!.removeCallbacksAndMessages(null)
     try {
+      if (debounceHandler == null) {
+        val looper = debounceThread?.looper ?: return
+        debounceHandler = Handler(looper)
+      }
+
+      debounceHandler!!.removeCallbacksAndMessages(null)
       debounceHandler!!.postDelayed(update, update.scheduleDelay)
     } catch (ex:IllegalStateException) {
       Log.w(TAG,"Debounce handler thread is dead", ex)
 
       debounceHandler = null
       startHandlerThread(true)
+      scheduleUpdate(update)
     }
   }
 
