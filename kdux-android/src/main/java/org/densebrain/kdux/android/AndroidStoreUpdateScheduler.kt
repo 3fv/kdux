@@ -17,6 +17,7 @@ class AndroidStoreUpdateScheduler(context: Context) : StoreUpdateScheduler, Life
   private var updateThread:HandlerThread? = null
   private var updateHandler:Handler? = null
 
+  @Synchronized
   override fun schedule(update: StoreUpdate) {
     try {
       updateHandler?.post(update)
