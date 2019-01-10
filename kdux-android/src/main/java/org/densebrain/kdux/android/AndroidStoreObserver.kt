@@ -44,9 +44,11 @@ open class AndroidStoreObserver<T : State, R>(
 
     private var debounceThread:HandlerThread? = null
 
+    private var debounceHandler:Handler? = null
+
     @Synchronized
     private fun startHandlerThread(force:Boolean = false) {
-      if (debounceThread == null || force) {
+      if (debounceHandler == null || debounceThread == null || !debounceThread!!.isAlive || force) {
         if (debounceThread != null) {
           Try {
             debounceThread!!.quitSafely()
@@ -55,6 +57,9 @@ open class AndroidStoreObserver<T : State, R>(
         debounceThread = HandlerThread(AndroidStoreObserver::class.java.name).apply {
           start()
         }
+
+        val looper = debounceThread?.looper ?: return
+        debounceHandler = Handler(looper)
       }
     }
 
@@ -75,8 +80,6 @@ open class AndroidStoreObserver<T : State, R>(
 
   private val androidStore
     get() = store as AndroidStore
-
-  private var debounceHandler:Handler? = null
 
   /**
    * Observer id for tracking
@@ -129,19 +132,12 @@ open class AndroidStoreObserver<T : State, R>(
   @Synchronized
   private fun scheduleUpdate(update:DebounceUpdate) {
     try {
-      if (debounceHandler == null) {
-        val looper = debounceThread?.looper ?: return
-        debounceHandler = Handler(looper)
-      }
+      startHandlerThread()
 
       debounceHandler!!.removeCallbacksAndMessages(null)
       debounceHandler!!.postDelayed(update, update.scheduleDelay)
     } catch (ex:IllegalStateException) {
       Log.w(TAG,"Debounce handler thread is dead", ex)
-
-      debounceHandler = null
-      startHandlerThread(true)
-      scheduleUpdate(update)
     }
   }
 

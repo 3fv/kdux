@@ -18,27 +18,35 @@ class AndroidStoreUpdateScheduler(context: Context) : StoreUpdateScheduler, Life
   private var updateHandler:Handler? = null
 
   @Synchronized
-  override fun schedule(update: StoreUpdate) {
-    try {
-      updateHandler?.post(update)
-    } catch (ex:IllegalStateException) {
-      Try { updateThread!!.quitSafely() }
-
+  private fun startHandlerThread(force:Boolean = false) {
+    if (updateHandler == null || updateThread == null || !updateThread!!.isAlive || force) {
+      if (updateThread != null) {
+        Try {
+          updateThread!!.quitSafely()
+        }
+      }
       updateThread = HandlerThread(AndroidStoreUpdateScheduler::class.java.name).apply {
         start()
       }
+
       updateHandler = Handler(updateThread!!.looper)
+    }
+  }
+
+
+  @Synchronized
+  override fun schedule(update: StoreUpdate) {
+    try {
+      startHandlerThread()
+      updateHandler?.post(update)
+    } catch (ex:IllegalStateException) {
       schedule(update)
     }
   }
 
   @OnLifecycleEvent(Lifecycle.Event.ON_START)
   fun onStart() {
-    updateThread = HandlerThread(AndroidStoreUpdateScheduler::class.java.name).apply {
-      start()
-    }
-    updateHandler = Handler(updateThread!!.looper)
-
+    startHandlerThread()
   }
 
   @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
