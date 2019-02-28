@@ -31,13 +31,18 @@ buildscript {
   }
 }
 
-if (tasks.getByName("build") == null) {
-  task build() {
-    doLast {
-      println("Built")
-    }
-  }
-}
+//def buildTask = null
+//try {
+//  buildTask = tasks.getByName("build")
+//} catch (ex) {}
+//
+//if (buildTask == null) {
+//  task build() {
+//    doLast {
+//      println("Built")
+//    }
+//  }
+//}
 /**
  * Publish install all
  */
