@@ -29,6 +29,7 @@ android {
       minifyEnabled false
       proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
     }
+
   }
   
 }
@@ -57,7 +58,7 @@ publishing {
       groupId 'org.densebrain'
       artifactId project.name
       version project.version
-  
+
       artifact bundleReleaseAar
       artifact sourceJar {
         classifier "sources"
