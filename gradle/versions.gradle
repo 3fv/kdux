@@ -1,7 +1,7 @@
 ext {
   Versions = [
-    androidGradle          : '3.3.2',
-//    androidGradle          : '3.5.0-alpha06',
+//    androidGradle          : '3.3.2',
+    androidGradle          : '3.5.0-alpha06',
 
     androidSupport         : '28.0.0',
     androidTest            : '1.1.0',
@@ -11,7 +11,7 @@ ext {
     androidTestRunner      : '1.0.2',
     androidConstraintLayout: '1.0.2',
     androidLifecycle       : "2.0.0",
-    androidAppCompat       : "1.0.0",
+    androidAppCompat       : "1.0.2",
 
     googleTruth            : '0.42',
     

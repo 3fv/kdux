@@ -19,6 +19,7 @@ buildscript {
   
   repositories {
     google()
+    //gradlePluginPortal()
     jcenter()
     mavenCentral()
   }
@@ -83,10 +84,10 @@ allprojects {currentProject ->
   // SET VERSION
   currentProject.version = VERSION
   
-  buildscript {
-    apply from: "${rootDir}/gradle/versions.gradle"
-
-  }
+//  buildscript {
+//    apply from: "${rootDir}/gradle/versions.gradle"
+//
+//  }
  
   // PLUGINS
   apply plugin: 'idea'
@@ -96,13 +97,18 @@ allprojects {currentProject ->
   if (!["example-app","kdux-android"].contains(currentProject.name)) {
     apply plugin: 'java'
     apply plugin: 'kotlin'
-    
+    apply plugin: 'maven'
+    apply plugin: 'maven-publish'
+
     sourceCompatibility = Versions.SOURCE_VERSION
     targetCompatibility = Versions.SOURCE_VERSION
     
   } else if (currentProject.name == "kdux-android") {
     apply plugin: 'com.android.library'
     apply plugin: 'kotlin-android'
+    apply plugin: 'maven'
+    apply plugin: 'maven-publish'
+
   } else {
     apply plugin: 'com.android.application'
     apply plugin: 'kotlin-android'
@@ -161,7 +167,7 @@ allprojects {currentProject ->
     bintray {
       user = 'jonglanz'
       key = binTrayKey
-      publications = ['mavenJava']
+      publications = [(currentProject.name == "kdux-android" ? "RELEASE" : 'mavenJava')]
       pkg {
         repo = 'oss'
         name = currentProject.name
@@ -170,7 +176,7 @@ allprojects {currentProject ->
         vcsUrl = 'https://github.com/jglanz/kdux.git'
         version {
           name = VERSION
-          released = new java.util.Date()
+          released = new Date()
         }
       }
     }
