@@ -84,10 +84,10 @@ allprojects {currentProject ->
   // SET VERSION
   currentProject.version = VERSION
   
-//  buildscript {
-//    apply from: "${rootDir}/gradle/versions.gradle"
-//
-//  }
+  buildscript {
+    apply from: "${rootDir}/gradle/versions.gradle"
+
+  }
  
   // PLUGINS
   apply plugin: 'idea'
@@ -106,8 +106,8 @@ allprojects {currentProject ->
   } else if (currentProject.name == "kdux-android") {
     apply plugin: 'com.android.library'
     apply plugin: 'kotlin-android'
-    apply plugin: 'maven'
-    apply plugin: 'maven-publish'
+//    apply plugin: 'maven'
+//    apply plugin: 'maven-publish'
 
   } else {
     apply plugin: 'com.android.application'
@@ -167,7 +167,8 @@ allprojects {currentProject ->
     bintray {
       user = 'jonglanz'
       key = binTrayKey
-      publications = [(currentProject.name == "kdux-android" ? "RELEASE" : 'mavenJava')]
+      //publications = [(currentProject.name == "kdux-android" ? "RELEASE" : 'mavenJava')]
+      publications = ['mavenJava']
       pkg {
         repo = 'oss'
         name = currentProject.name

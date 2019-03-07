@@ -1,6 +1,6 @@
-//buildscript {
-//  apply from: "${rootDir}/gradle/versions.gradle"
-//}
+buildscript {
+  apply from: "${rootDir}/gradle/versions.gradle"
+}
 
 //apply plugin: 'com.android.library'
 //apply plugin: 'kotlin-android'
@@ -57,13 +57,13 @@ task sourceJar(type: Jar) {
 
 publishing {
   publications {
-    "RELEASE"(MavenPublication) {
+    mavenJava(MavenPublication) {
       groupId 'org.densebrain'
       artifactId project.name
       version project.version
 
-      artifact "${project.buildDir}/outputs/aar/${project.name}-release.aar"
-      //artifact bundleReleaseAar
+      //artifact "${project.buildDir}/outputs/aar/${project.name}-release.aar"
+      artifact bundleReleaseAar
       //artifact
       artifact sourceJar {
         classifier "sources"
