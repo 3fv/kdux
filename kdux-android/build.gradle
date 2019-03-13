@@ -2,11 +2,6 @@ buildscript {
   apply from: "${rootDir}/gradle/versions.gradle"
 }
 
-//apply plugin: 'com.android.library'
-//apply plugin: 'kotlin-android'
-//apply plugin: 'kotlin-android-extensions'
-
-
 android {
   compileSdkVersion Versions.COMPILE_SDK_VERSION
   
@@ -60,11 +55,9 @@ publishing {
     mavenJava(MavenPublication) {
       groupId 'org.densebrain'
       artifactId project.name
-      version project.version
+      version VERSION
 
-      //artifact "${project.buildDir}/outputs/aar/${project.name}-release.aar"
       artifact bundleReleaseAar
-      //artifact
       artifact sourceJar {
         classifier "sources"
       }
