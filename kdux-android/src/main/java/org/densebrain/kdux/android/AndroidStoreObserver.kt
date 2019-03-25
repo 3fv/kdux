@@ -7,8 +7,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import androidx.lifecycle.ProcessLifecycleOwner
-import arrow.core.Try
-import arrow.core.recover
 import org.densebrain.kdux.store.*
 import java.lang.IllegalStateException
 import java.util.*
@@ -50,9 +48,9 @@ open class AndroidStoreObserver<T : State, R>(
     private fun startHandlerThread(force:Boolean = false) {
       if (debounceHandler == null || debounceThread == null || !debounceThread!!.isAlive || force) {
         if (debounceThread != null) {
-          Try {
+          try {
             debounceThread!!.quitSafely()
-          }
+          } catch (ex:Exception) {}
         }
         debounceThread = HandlerThread(AndroidStoreObserver::class.java.name).apply {
           start()

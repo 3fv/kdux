@@ -1,3 +1,40 @@
 {
-  "description": "Here we have custom description"
+  "name": "kdux-core",
+  "private": false,
+  "version": "1.0.0",
+  "description": "KDUX core module",
+  "main": "js/kdux-core.js",
+  "files": [
+    "js/kdux-core.js",
+    "js/kdux-core.meta.js"
+  ],
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jglanz/kdux.git"
+  },
+  "keywords": [
+    "redux",
+    "state"
+  ],
+  "author": "Jonathan Glanz",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jglanz/kdux/issues"
+  },
+  "homepage": "https://github.com/jglanz/kdux#readme",
+  "jest": {
+    "reporters": ["default","jest-junit"],
+    "modulePathIgnorePatterns": ["<rootDir>/resources"],
+    "testMatch": ["**/kdux-core-tests.js"],
+    "moduleNameMapper": {
+      "kdux-core": "<rootDir>/js/kdux-core.js"
+    }
+  },
+  "jest-junit": {
+    "outputDirectory": "./test-results",
+    "outputName": "junit.xml"
+  }
 }

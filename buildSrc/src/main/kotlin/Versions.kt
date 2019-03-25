@@ -28,7 +28,7 @@ object Versions {
     val anko                   = "0.10.5"
     val gradle          = "3.3.2"
     val support         = "28.0.0"
-    val test            = "1.1.0"
+    val test            = "1.1.1"
     val testCore        = "1.0.0"
     val testExt         = "1.0.0"
     val testEspresso    = "3.1.0"

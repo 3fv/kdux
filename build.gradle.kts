@@ -15,120 +15,13 @@ buildscript {
     }
   }
 
-
   dependencies {
     classpath("com.android.tools.build:gradle:${Versions.android.gradle}")
     classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${Versions.kotlin}")
     classpath("com.jfrog.bintray.gradle:gradle-bintray-plugin:${Versions.bintray}")
-    classpath("org.jetbrains.kotlin:kotlin-frontend-plugin:${Versions.kotlinFrontend}")
   }
 }
 
-//plugins {
-//  kotlin("jvm") version Versions.kotlin
-//  `maven-publish`
-//  id("com.jfrog.bintray") version Versions.bintray
-//}
-
-//val version = extra.get("version") as String
-//val binTrayKey = extra.get("binTrayKey") as String
-
-//val publishProjects = arrayOf(
-//  "kdux-android",
-//  "kdux-core"
-//)
-//def buildTask = null
-//try {
-//  buildTask = tasks.getByName("build")
-//} catch (ex) {}
-//
-//if (buildTask == null) {
-//  task build() {
-//    doLast {
-//      println("Built")
-//    }
-//  }
-//}
-/**
- * Publish install all
- */
-//val publishAll = tasks.create("publishAll") {
-//  dependsOn("build")
-//
-//  doLast {
-//    println("All published")
-//  }
-//}
-//
-///**
-// * Publish install all
-// */
-//val publishAllLocal = tasks.create("publishAllLocal") {
-//  doLast {
-//    println("All published locally")
-//  }
-//}
-//
-//val installAllLocal = tasks.create("installAllLocal") {
-//  doLast {
-//    println("All installed locally")
-//  }
-//}
-//
-//tasks.create("installLocal") {
-//  dependsOn(publishAllLocal, installAllLocal)
-//}
-
-
-/**
- * Configure all projects
- */
-//allprojects.forEach { currentProject ->
-//
-//  // SET VERSION
-//  currentProject.version = version
-//
-//
-//  // IF NOT APP THEN APPLY
-//  if (!arrayOf("example-app", "kdux-android").contains(currentProject.name)) {
-//
-//    /**
-//     * Configure java/kotlin source
-//     */
-//    configure<JavaPluginConvention> {
-//      sourceCompatibility = JavaVersion.VERSION_1_8
-//      targetCompatibility = JavaVersion.VERSION_1_8
-//      sourceSets {
-//        getByName("main") {
-//          java {
-//            srcDirs("src/main/kotlin")
-//          }
-//        }
-//      }
-//    }
-//
-//
-//  } else if (currentProject.name == "kdux-android") {
-//    plugins {
-//      id("idea")
-//      id("com.android.library")
-//      id("kotlin-android")
-//    }
-//  } else {
-//    plugins {
-//      id("idea")
-//      id("com.android.application")
-//      id("kotlin-android")
-//      id("kotlin-kapt")
-//    }
-//  }
-//
-//  // KOTLIN
-////  kotlin {
-////    experimental { coroutines 'enable' }
-////  }
-//
-//
 //  configurations.all {
 //    resolutionStrategy {
 //      exclude(group = "org.jetbrains.kotlin", module = "kotlin-stdlib-jre7")
