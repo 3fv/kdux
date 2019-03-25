@@ -9,7 +9,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import androidx.lifecycle.ProcessLifecycleOwner
-import arrow.core.Try
 import java.lang.IllegalStateException
 
 class AndroidStoreUpdateScheduler(context: Context) : StoreUpdateScheduler, LifecycleObserver {
@@ -21,9 +20,9 @@ class AndroidStoreUpdateScheduler(context: Context) : StoreUpdateScheduler, Life
   private fun startHandlerThread(force:Boolean = false) {
     if (updateHandler == null || updateThread == null || !updateThread!!.isAlive || force) {
       if (updateThread != null) {
-        Try {
+        try {
           updateThread!!.quitSafely()
-        }
+        } catch (ex:Exception) {}
       }
       updateThread = HandlerThread(AndroidStoreUpdateScheduler::class.java.name).apply {
         start()

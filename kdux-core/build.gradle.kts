@@ -1,11 +1,6 @@
 import com.jfrog.bintray.gradle.BintrayExtension
+import js.NpmTask
 import org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile
-import org.jetbrains.kotlin.gradle.dsl.KotlinJsOptions
-import org.jetbrains.kotlin.gradle.frontend.karma.KarmaExtension
-import org.jetbrains.kotlin.gradle.frontend.webpack.WebPackBundleTask
-import org.jetbrains.kotlin.gradle.frontend.webpack.WebPackBundler
-import org.jetbrains.kotlin.gradle.frontend.webpack.WebPackExtension
-import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinJsCompilation
 import java.util.Date
 
 plugins {
@@ -13,8 +8,8 @@ plugins {
   id("java")
   id("java-library")
   id("maven-publish")
-  kotlin("multiplatform") //version Versions.kotlin
-  id("com.jfrog.bintray") //version Versions.bintray
+  kotlin("multiplatform")
+  id("com.jfrog.bintray")
   id("org.jetbrains.kotlin.frontend")
 }
 
@@ -32,9 +27,10 @@ kotlin {
           kotlinOptions {
             metaInfo = true
             sourceMap = true
+            //sourceMapPrefix = projectDir.absolutePath
             sourceMapEmbedSources = "always"
             moduleKind = "commonjs"
-            //main = "noCall"
+            main = "call"
           }
         }
       }
@@ -42,7 +38,6 @@ kotlin {
       configure(listOf(compilations["test"])) {
         tasks.getByName<KotlinJsCompile>(compileKotlinTaskName) {
           kotlinOptions {
-            //main = "call"
             outputFile = "${project.buildDir.absolutePath}/js-tests/${project.name}-tests.js"
           }
         }
@@ -51,7 +46,6 @@ kotlin {
       configure(listOf(compilations["main"])) {
         tasks.getByName<KotlinJsCompile>(compileKotlinTaskName) {
           kotlinOptions {
-            main = "call"
             outputFile = "${project.buildDir.absolutePath}/js/${project.name}.js"
           }
         }
@@ -64,14 +58,15 @@ kotlin {
       sourceSet.kotlin.srcDir("${sourceSet.name}/kotlin")
     }
 
-    val commonMain by getting {
+    commonMain {
       dependencies {
         implementation(kotlin("reflect"))
         implementation(kotlin("stdlib-common"))
         implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-common:${Versions.kotlinCoroutine}")
       }
     }
-    val commonTest by getting {
+     
+    commonTest {
       dependencies {
         implementation(kotlin("test-common"))
         implementation(kotlin("test-annotations-common"))
@@ -104,13 +99,11 @@ kotlin {
           implementation(kotlin("stdlib-js"))
           implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-js:${Versions.kotlinCoroutine}")
         }
-        /* ... */
       }
       compilations["test"].defaultSourceSet {
         dependencies {
           implementation(kotlin("test-js"))
         }
-        /* ... */
       }
     }
 
@@ -131,20 +124,22 @@ kotlinFrontend {
   sourceMaps = true
 
   npm {
-    devDependency("karma")
+    //devDependency("karma")
+    dependency("source-map-support")
     devDependency("jest")
+    devDependency("jest-junit")
   }
 
-  bundle<WebPackExtension>("webpack") {
-    val webPack = this@bundle as WebPackExtension
-    webPack.bundleName = "main"
-    //webPack.proxyUrl = "http://localhost:8080"
-
-  }
-
-  karma {
-    //enableWebPack = true
-  }
+//  bundle<WebPackExtension>("webpack") {
+//    val webPack = this@bundle as WebPackExtension
+//    webPack.bundleName = "main"
+//    //webPack.proxyUrl = "http://localhost:8080"
+//
+//  }
+//
+//  karma {
+//    //enableWebPack = true
+//  }
 
 }
 
@@ -154,6 +149,10 @@ kotlinFrontend {
 val sourcesJar = tasks.create<Jar>("sourceJar") {
   classifier = "sources"
   from(sourceSets["main"].java.srcDirs)
+}
+
+val jest = tasks.create("jest", NpmTask::class.java) {
+  args = listOf("run","test")
 }
 
 /**
@@ -186,7 +185,7 @@ configure<PublishingExtension> {
 bintray {
   user = "jonglanz"
   key = binTrayKey
-  setPublications("mavenJava")
+  setPublications(publicationName)
   pkg(delegateClosureOf<BintrayExtension.PackageConfig> {
     repo = "oss"
     name = project.name
@@ -197,11 +196,11 @@ bintray {
       released = Date().toString()
       name = currentVersion
     })
-
-//        version {
-//          name = version
-//          released = new Date ()
-//        }
   })
+}
+
+
+afterEvaluate {
+  tasks.getByName("jsTest").dependsOn(jest)
 }
 
