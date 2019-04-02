@@ -39,3 +39,19 @@ object Versions {
 
   }
 }
+
+object Deps {
+  object kotlin {
+    object coroutines {
+      val common = "org.jetbrains.kotlinx:kotlinx-coroutines-core-common:${Versions.kotlinCoroutine}"
+      val jvm = "org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.kotlinCoroutine}"
+      val js = "org.jetbrains.kotlinx:kotlinx-coroutines-core-js:${Versions.kotlinCoroutine}"
+    }
+  }
+
+
+  object jvm {
+    val slf4j = "org.slf4j:slf4j-api:${Versions.jvm.slf4j}"
+  }
+
+}

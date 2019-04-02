@@ -113,6 +113,7 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
 bintray {
   user = "jonglanz"
   key = binTrayKey
+  publish = true
   setPublications(publicationName)
   pkg(delegateClosureOf<BintrayExtension.PackageConfig> {
     repo = "oss"
