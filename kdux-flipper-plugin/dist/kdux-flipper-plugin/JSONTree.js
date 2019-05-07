@@ -1,39 +1,49 @@
-import React from 'react'
-import ReactJSONTree from 'react-json-tree/src/index'
+"use strict";
 
-const getLabelStyle = ({ style }, nodeType, expanded) => ({
-  style: {
-    ...style,
-    textTransform: expanded ? 'uppercase' : style.textTransform
-  }
+Object.defineProperty(exports, "__esModule", {
+  value: true
 });
+exports.default = void 0;
 
-const getBoolStyle = ({ style }, nodeType) => ({
-  style: {
-    ...style,
-    border: nodeType === 'Boolean' ? '1px solid #DD3333' : style.border,
-    borderRadius: nodeType === 'Boolean' ? 3 : style.borderRadius
-  }
-});
+var _react = _interopRequireDefault(require("react"));
 
-const getItemString = type => (
-  <span>
-    {' // '}
-    {type}
-  </span>
-);
+var _index = _interopRequireDefault(require("react-json-tree/src/index"));
 
-const getValueLabelStyle = ({ style }, nodeType, keyPath) => ({
-  style: {
-    ...style,
-    color:
-      !Number.isNaN(keyPath[0]) && !(parseInt(keyPath, 10) % 2)
-        ? '#33F'
-        : style.color
-  }
-});
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-// const longString =
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+const getLabelStyle = (_ref, nodeType, expanded) => {
+  let style = _ref.style;
+  return {
+    style: _objectSpread({}, style, {
+      textTransform: expanded ? 'uppercase' : style.textTransform
+    })
+  };
+};
+
+const getBoolStyle = (_ref2, nodeType) => {
+  let style = _ref2.style;
+  return {
+    style: _objectSpread({}, style, {
+      border: nodeType === 'Boolean' ? '1px solid #DD3333' : style.border,
+      borderRadius: nodeType === 'Boolean' ? 3 : style.borderRadius
+    })
+  };
+};
+
+const getItemString = type => _react.default.createElement("span", null, ' // ', type);
+
+const getValueLabelStyle = (_ref3, nodeType, keyPath) => {
+  let style = _ref3.style;
+  return {
+    style: _objectSpread({}, style, {
+      color: !Number.isNaN(keyPath[0]) && !(parseInt(keyPath, 10) % 2) ? '#33F' : style.color
+    })
+  };
+}; // const longString =
 //   'Loremipsumdolorsitamet,consecteturadipiscingelit.Namtempusipsumutfelisdignissimauctor.Maecenasodiolectus,finibusegetultricesvel,aliquamutelit.Loremipsumdolorsitamet,consecteturadipiscingelit.Namtempusipsumutfelisdignissimauctor.Maecenasodiolectus,finibusegetultricesvel,aliquamutelit.Loremipsumdolorsitamet,consecteturadipiscingelit.Namtempusipsumutfelisdignissimauctor.Maecenasodiolectus,finibusegetultricesvel,aliquamutelit.'; // eslint-disable-line max-len
 //
 // const Custom = function(value) {
@@ -93,6 +103,7 @@ const getValueLabelStyle = ({ style }, nodeType, keyPath) => ({
 //   longString
 // };
 
+
 const theme = {
   scheme: 'monokai',
   author: 'wimer hazenberg (http://www.monokai.nl)',
@@ -114,19 +125,16 @@ const theme = {
   base0F: '#cc6633'
 };
 
-
-type P = {
-  data: Object
-}
-
-type S = {
-
-}
-
-export default class JSONTree extends React.PureComponent<P,S> {
-
-  render(): React.ReactElement<any> | string | number | {} | React.ReactNodeArray | React.ReactPortal | boolean | null | undefined {
-    const {data} = this.props
-    return <ReactJSONTree data={data} theme={theme} invertTheme={true} />
+class JSONTree extends _react.default.PureComponent {
+  render() {
+    const data = this.props.data;
+    return _react.default.createElement(_index.default, {
+      data: data,
+      theme: theme,
+      invertTheme: true
+    });
   }
+
 }
+
+exports.default = JSONTree;

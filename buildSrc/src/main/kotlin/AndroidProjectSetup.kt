@@ -1,18 +1,23 @@
+import com.android.build.gradle.BaseExtension
+import com.android.build.api.dsl.extension.LibraryExtension
+import com.android.build.api.dsl.model.BuildType
 import com.android.build.gradle.TestedExtension
+import com.android.build.gradle.tasks.BundleAar
+//import com.android.build.gradle.TestedExtension
+//import com.android.build.gradle.LibraryExtension
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.*
 import java.net.URI
+import Versions
+import org.gradle.api.publish.PublishingExtension
+import org.gradle.api.publish.maven.MavenPublication
+import org.gradle.api.tasks.bundling.Jar
 
 fun androidProjectSetup(project: Project) = with(project) {
-  repositories {
-    google()
-    jcenter()
-    mavenCentral()
-    maven {
-      url = URI("https://dl.bintray.com/kotlin/kotlin-eap")
-    }
-    mavenLocal()
-  }
+  val kotlinVersion = Versions.Plugins.Kotlin
+  logger.quiet("Kotlin version: ${kotlinVersion}")
+  addRepositories(repositories)
+
 
 
 
@@ -26,69 +31,109 @@ fun androidProjectSetup(project: Project) = with(project) {
     defaultConfig {
       setMinSdkVersion(Versions.android.minSdk)
       setTargetSdkVersion(Versions.android.targetSdk)
-      versionCode = kduxVersionCode
-      versionName = kduxVersion
+      versionCode = kduxVersionCode// kduxVersion.split(".").last().toInt()
+      versionName = kduxVersion //.split(".").subList(0,2).joinToString(".")
       testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
     }
+
     buildTypes {
       getByName("release") {
         isMinifyEnabled = false
         setProguardFiles(listOf(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"))
+
       }
     }
 
     testOptions {
       execution = "ANDROIDX_TEST_ORCHESTRATOR"
     }
+
+    packagingOptions {
+      pickFirst("lib/**/*.so")
+    }
+
+    afterEvaluate {
+      tasks.withType<BundleAar> {
+        archiveVersion.set(kduxVersion)
+      }
+    }
   }
 
+  configurations.all {
+    resolutionStrategy {
+      force(
+        Deps.jvm.findBugs
+      )
+    }
+  }
   dependencies {
 
-    "implementation"(project(":kdux-core")) {
+
+    "implementation"(Deps.kotlin.stdlib.jvm)
+    "implementation"(kduxCoreProject) {
       setTransitive(true)
     }
-    "implementation"(kotlin("stdlib-jdk8"))
-
-
-    "implementation"(kduxCoreProject)
-
 
     listOf(
-      "androidx.lifecycle:lifecycle-extensions:${Versions.android.lifecycle}",
-      "androidx.lifecycle:lifecycle-common-java8:${Versions.android.lifecycle}",
-      "androidx.appcompat:appcompat:${Versions.android.appCompat}"
+      Deps.kotlin.coroutines.common,
+      Deps.kotlin.coroutines.jvm,
+      *Deps.android.lifecycle
     ).forEach {
       "implementation"(it)
     }
 
-    "androidTestUtil"("androidx.test:orchestrator:${Versions.android.test}")
+    "androidTestUtil"(Deps.android.test.orchestrator)
 
     // Core library
-    listOf(
-      "androidx.test:core:${Versions.android.testCore}",
 
-      // AndroidJUnitRunner and JUnit Rules
-      "androidx.test:runner:${Versions.android.test}",
-      "androidx.test:rules:${Versions.android.test}",
-
-      // Assertions
-      "androidx.test.ext:junit:${Versions.android.testExt}",
-      "androidx.test.ext:truth:${Versions.android.testExt}",
-      "com.google.truth:truth:${Versions.jvm.googleTruth}",
-
-      // Espresso dependencies
-      "androidx.test.espresso:espresso-core:${Versions.android.testEspresso}",
-      "androidx.test.espresso:espresso-contrib:${Versions.android.testEspresso}",
-      "androidx.test.espresso:espresso-intents:${Versions.android.testEspresso}",
-      "androidx.test.espresso:espresso-accessibility:${Versions.android.testEspresso}",
-      "androidx.test.espresso:espresso-web:${Versions.android.testEspresso}",
-      "androidx.test.espresso.idling:idling-concurrent:${Versions.android.testEspresso}",
-
-
-      "androidx.test.espresso:espresso-idling-resource:${Versions.android.testEspresso}"
-    ).forEach { "androidTestImplementation"(it) }
+    Deps.android.test.framework.forEach { "androidTestImplementation"(it) }
 
   }
 
+}
+
+fun androidProjectPublishSetup(project: Project) = with(project) {
+
+  val sourcesJar = tasks.register<Jar>("sourcesJar") {
+    archiveClassifier.set("sources")
+    from(project.the<BaseExtension>().sourceSets["main"].java.srcDirs)
+  }
+
+
+  /**
+   * Artifacts (SOURCES)
+   */
+  artifacts {
+    add("archives", sourcesJar)
+  }
+
+
+  /**
+   * Publication name to be used between
+   * maven-publish
+   */
+
+  uploadPublications.add(defaultPublicationName)
+
+
+  afterEvaluate {
+    /**
+     * Configure publish
+     */
+    configure<PublishingExtension> {
+      publications.create<MavenPublication>(defaultPublicationName) {
+        groupId = "org.densebrain"
+        artifactId = project.name
+        version = project.kduxVersion
+
+        logger.quiet("Release AAR: ${androidLibraryReleaseAar.get().asFile.absolutePath}")
+        artifact(sourcesJar.get())
+        artifact(androidLibraryReleaseAar)
+      }
+    }
+  }
+  tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+    kotlinOptions.jvmTarget = Versions.jvm.source
+  }
 }

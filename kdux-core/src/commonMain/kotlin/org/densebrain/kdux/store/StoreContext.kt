@@ -1,14 +1,24 @@
 package org.densebrain.kdux.store
 
 import org.densebrain.kdux.actions.Actions
+import org.densebrain.kdux.util.Event
+import kotlin.properties.Delegates
 import kotlin.reflect.KClass
 
+class StoreReadyEvent
+
 object StoreContext {
+
+  object events {
+    val ready = Event<StoreReadyEvent>()
+  }
 
   /**
    * Internal ref to store
    */
-  private var internalStore: Store? = null
+  private var internalStore by Delegates.observable<Store?>(null) { _, _, _ ->
+    events.ready.emit(StoreReadyEvent())
+  }
 
   /**
    * Check if the store is ready

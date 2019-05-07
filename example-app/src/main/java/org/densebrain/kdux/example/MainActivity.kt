@@ -50,7 +50,7 @@ class MainActivity : AppCompatActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     val binding = DataBindingUtil.setContentView<ActivityMainBinding>(this,R.layout.activity_main)
-    binding.setLifecycleOwner(this)
+    binding.lifecycleOwner = this
     binding.model = StateLiveData(ExampleState::class)
     binding.actions = actions()
   }

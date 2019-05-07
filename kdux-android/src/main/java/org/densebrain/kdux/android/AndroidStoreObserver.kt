@@ -10,7 +10,6 @@ import androidx.lifecycle.ProcessLifecycleOwner
 import org.densebrain.kdux.store.*
 import java.lang.IllegalStateException
 import java.util.*
-import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicLong
 import kotlin.math.min
@@ -175,10 +174,9 @@ open class AndroidStoreObserver<T : State, R>(
       observer.pushUpdate(this)
     }
 
-    override fun equals(o: Any?): Boolean {
-      val other = o as? DebounceUpdate ?: return false
-      return other.id == id
-    }
+    override fun equals(other: Any?): Boolean =
+      (other as? DebounceUpdate)?.id == id
+
 
     override fun hashCode(): Int {
       return id.hashCode()

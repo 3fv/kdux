@@ -1,7 +1,26 @@
+import java.util.Properties
+import java.io.StringReader
+import Script.Versions
+
+buildscript {
+  apply(from = "ko-gradle.gradle")
+
+  repositories {
+    flatDir {
+      dirs("${buildDir}/ko-repo/ko-artifact")
+    }
+  }
+
+  dependencies {
+    classpath("ko-artifact:ko:1.0.0")
+  }
+}
+
 plugins {
   base
   java
-  kotlin("jvm") version "1.3.21"
+  id("org.densebrain.gradle.ko-generator-plugin")
+  `kotlin-dsl`
 }
 
 repositories {
@@ -11,13 +30,19 @@ repositories {
   maven {
     setUrl("https://dl.bintray.com/kotlin/kotlin-eap")
   }
+  mavenLocal()
+}
+
+koGenerator {
+  packageName = "Script"
 }
 
 dependencies {
-  compile(kotlin("stdlib"))
-  compile(gradleApi())
-  compile("com.android.tools.build:gradle:3.3.2")
-  compile("org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.21")
-  compile("org.jetbrains.kotlin:kotlin-frontend-plugin:0.0.45")
-  //runtime("org.jetbrains.kotlin:kotlin-frontend-plugin:0.0.45")
+  "compileOnly"(gradleApi())
+  "compileOnly"("com.android.tools.build:gradle:${Versions.Plugins.Android}")
+  "runtime"("com.android.tools.build:gradle:${Versions.Plugins.Android}")
+  "compile"("org.jetbrains.kotlin:kotlin-gradle-plugin:${Versions.Plugins.Kotlin}")
+  "compile"("org.jetbrains.kotlin:kotlin-frontend-plugin:${Versions.Plugins.KotlinFrontend}")
+  "compile"("com.jfrog.bintray.gradle:gradle-bintray-plugin:${Versions.Plugins.Bintray}")
+
 }

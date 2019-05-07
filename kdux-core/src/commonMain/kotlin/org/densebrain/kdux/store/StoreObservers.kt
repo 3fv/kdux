@@ -7,7 +7,10 @@ class StoreObservers(vararg observers:StoreObserver<*>) {
     this.observers.add(observer)
   }
 
-  fun attach(doUpdate: Boolean = true) = observers.forEach { it.attach(doUpdate) }
+  fun attach(doUpdate: Boolean = true):StoreObservers {
+    observers.forEach { it.attach(doUpdate) }
+    return this
+  }
 
   fun detach() = observers.forEach { it.detach() }
 
