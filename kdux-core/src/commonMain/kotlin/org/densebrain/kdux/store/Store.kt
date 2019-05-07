@@ -3,6 +3,7 @@ package org.densebrain.kdux.store
 import org.densebrain.kdux.reducers.Reducer
 import org.densebrain.kdux.actions.Actions
 import org.densebrain.kdux.util.Reflection
+import org.densebrain.kdux.util.invokeSynchronized
 import org.densebrain.kdux.util.shallowEquals
 import kotlin.collections.LinkedHashSet
 import kotlin.reflect.KClass
@@ -12,10 +13,18 @@ import kotlin.reflect.KClass
  */
 typealias PendingActionReducer = Pair<Actions<*>, Reducer<*>>
 
+
 /**
  * Root State type
  */
-typealias RootState = Map<KClass<*>, State>
+open class RootState(map: Map<KClass<*>, State> = mapOf()) : Map<KClass<*>, State> by map, State
+
+@Suppress("DELEGATED_MEMBER_HIDES_SUPERTYPE_OVERRIDE")
+open class MutableRootState(map: MutableMap<KClass<*>, State> = mutableMapOf()) : RootState(map),MutableMap<KClass<*>, State> by map
+
+fun Map<KClass<*>, State>.toRootState() = RootState(this)
+
+fun MutableMap<KClass<*>, State>.toMutableRootState() = MutableRootState(this)
 
 typealias StateSelector<T,R> = (state:T) -> R
 
@@ -38,7 +47,7 @@ open class Store(
   /**
    * Internal map of all leafs
    */
-  private var rootState: RootState = mapOf()
+  private var rootState: RootState = RootState()
 
   /**
    * Internal map for Actions
@@ -57,7 +66,7 @@ open class Store(
   private fun process(actions: Actions<*>, reducer: Reducer<*>) {
 
     // RUN REDUCERS
-    val newRootState = rootState.toMutableMap()
+    val newRootState = MutableRootState(rootState.toMutableMap())
 
     val stateType = actions.stateType
     val state = newRootState[stateType]!!
@@ -65,7 +74,7 @@ open class Store(
 
     if (state !== newState && !shallowEquals(stateType as KClass<State>,state ,newState )) {
       newRootState[stateType] = newState
-      rootState = newRootState.toMap()
+      rootState = newRootState.toRootState()
       updateScheduler.schedule(makeStoreUpdate(newRootState))
     }
   }
@@ -80,7 +89,7 @@ open class Store(
    */
   protected open fun update(rootState: RootState) {
     lateinit var observers: Set<StoreObserver<*>>
-    synchronized(this.observers) {
+    invokeSynchronized(this.observers) {
       observers = this.observers.toSet()
     }
 
@@ -93,7 +102,7 @@ open class Store(
    * Remove an observer
    */
   fun removeObserver(observer: StoreObserver<*>) {
-    synchronized(observers) {
+    invokeSynchronized(observers) {
       observers.remove(observer)
     }
   }
@@ -102,7 +111,7 @@ open class Store(
    * Add an observer
    */
   fun <R> addObserver(observer: StoreObserver<R>): StoreObserver<R> {
-    synchronized(observers) {
+    invokeSynchronized(observers) {
       if (!observers.contains(observer))
         observers.add(observer)
     }
@@ -183,7 +192,7 @@ open class Store(
       newRootState[action.stateType] = leafState
     }
 
-    rootState = newRootState.toMap()
+    rootState = newRootState.toRootState()
 
 
   }

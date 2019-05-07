@@ -1,0 +1,27 @@
+{
+  "name": "kdux-flipper-plugin",
+  "version": "1.0.0",
+  "description": "Plugin to help debugging and monitoring kdux enabled applications",
+  "main": "index.js",
+  "author": "Jonathan Glanz",
+  "license": "MIT",
+  "private": false,
+  "scripts": {
+    "build": "cd kdux-flipper-plugin && mkdir -p dist/kdux-flipper-plugin && babel src/main/javascript -d dist/kdux-flipper-plugin && cp ../package.json dist/kdux-flipper-plugin/package.json",
+    "dev": "npm run build && cd kdux-flipper-plugin && babel -w -d dist/kdux-flipper-plugin src/main/javascript"
+  },
+  "bundledDependencies": [
+    "react-json-tree"
+  ],
+  "dependencies": {
+    "react-json-tree": "^0.11.2"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.4.3",
+    "@babel/core": "^7.4.3",
+    "@babel/plugin-proposal-class-properties": "^7.4.0",
+    "@babel/preset-env": "^7.4.3",
+    "@babel/preset-flow": "^7.0.0",
+    "@babel/preset-react": "^7.0.0"
+  }
+}

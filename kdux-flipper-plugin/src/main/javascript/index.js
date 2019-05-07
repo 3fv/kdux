@@ -1,14 +1,17 @@
 import {Button, Input, FlipperPlugin, FlexColumn, styled, Text} from 'flipper'
 import type {Notification} from 'flipper/plugin'
+import JSONTree from "./JSONTree";
+import React from 'react'
 
 type DisplayMessageResponse = {
   greeting: string,
 }
 
-type State = {
+type S = {
   prompt: string,
   message: string,
 }
+
 
 type PersistedState = {
   currentNotificationIds: Array<number>,
@@ -16,13 +19,17 @@ type PersistedState = {
   storeState: Object
 }
 
+type P = {
+  persistedState:PersistedState
+}
+
 const Container = styled(FlexColumn)({
-  alignItems: 'center',
+  alignItems: 'left',
   justifyContent: 'space-around',
   padding: 20,
 })
 
-export default class extends FlipperPlugin<State, *, PersistedState> {
+export default class extends FlipperPlugin<S, *, P> {
   static defaultPersistedState = {
     currentNotificationIds: [],
     receivedMessage: null,
@@ -108,25 +115,15 @@ export default class extends FlipperPlugin<State, *, PersistedState> {
   }
 
   render() {
-    const {props, state} = this
+    const
+      {props, state} = this,
+      {persistedState} = this.props,
+      {storeState} = persistedState
+
     console.log("Render",props,state)
     return (
       <Container>
-        <Text>{this.state.prompt}</Text>
-        <Input
-          placeholder="Message"
-          onChange={event => {
-            this.setState({message: event.target.value})
-          }}
-        />
-        <Button onClick={this.sendState.bind(this)}>Send</Button>
-
-        <Text>
-          <pre>
-            State
-            {JSON.stringify(this.props.persistedState.storeState,null,2)}
-          </pre>
-        </Text>
+        <JSONTree data={storeState}/>
       </Container>
     )
   }

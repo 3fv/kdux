@@ -44,12 +44,14 @@ open class DefaultStoreObserver<T : State, R>(
    */
   @Suppress("UNCHECKED_CAST")
   override fun run(rootState: RootState) {
-    val leafState = rootState[stateKlazz] as? T ?: run {
-      log.warn("Leaf state is null ${stateKlazz.simpleName}")
-      return
+    val leafState = when(RootState::class) {
+      stateKlazz -> rootState
+      else ->rootState[stateKlazz] as? T ?: run {
+        log.warn("Leaf state is null ${stateKlazz.simpleName}")
+        return
+      }
     }
-
-    val newValue = getter(leafState)
+    val newValue = getter(leafState as T)
     if (newValue !== lastValue) {
       val oldValue = this.lastValue
       this.lastValue = newValue

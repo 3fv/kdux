@@ -2,31 +2,31 @@ import com.jfrog.bintray.gradle.BintrayExtension
 import js.NpmTask
 import org.gradle.api.publish.maven.internal.publication.DefaultMavenPublication
 import org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile
+import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+import org.jetbrains.kotlin.gradle.frontend.KotlinFrontendExtension
+import org.jetbrains.kotlin.gradle.frontend.npm.NpmExtension
+import org.jetbrains.kotlin.gradle.frontend.npm.NpmInstallTask
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
-import org.jetbrains.kotlin.konan.target.hostTargetSuffix
 import java.util.Date
 
 plugins {
   id("idea")
   id("java")
   id("java-library")
-  kotlin("multiplatform")
-  id("maven-publish")
-  id("com.jfrog.bintray")
-  id("org.jetbrains.kotlin.frontend")
+  kotlin("multiplatform") //version(Versions.plugins.kotlin)
+  id("org.jetbrains.kotlin.frontend")// version (Versions.plugins.kotlinFrontend)
+  `maven-publish`
+  `kdux-publish`
 }
 
-
-val (currentVersion,binTrayKey) = arrayOf("version","binTrayKey").map {
-  rootProject.extra.get(it) as String
-}
+addRepositories(repositories)
 
 kotlin {
   targets {
     targetFromPreset(presets.getByName("jvm"), "jvm") {
       compilations["main"].defaultSourceSet {
         dependencies {
-          implementation(kotlin("stdlib-jdk8"))
+          implementation(kotlin("stdlib-jdk8", Versions.Plugins.Kotlin))
           implementation(Deps.kotlin.coroutines.jvm)
           implementation(Deps.jvm.slf4j)
         }
@@ -34,7 +34,7 @@ kotlin {
       // JVM-specific tests and their dependencies:
       compilations["test"].defaultSourceSet {
         dependencies {
-          implementation(kotlin("test-junit5"))
+          implementation(kotlin("test-junit5", Versions.Plugins.Kotlin))
         }
       }
     }
@@ -42,8 +42,8 @@ kotlin {
     // Creates a JVM target with the default name 'jvm'
     targetFromPreset(presets.getByName("js"), "js") {
 
-      arrayOf("test","main").forEach { compilationName ->
-        val suffix = when(compilationName) {
+      arrayOf("test", "main").forEach { compilationName ->
+        val suffix = when (compilationName) {
           "test" -> "-tests"
           else -> ""
         }
@@ -72,38 +72,34 @@ kotlin {
 
     commonMain {
       dependencies {
-        implementation(kotlin("reflect"))
-        implementation(kotlin("stdlib-common"))
+        implementation(kotlin("reflect", Versions.Plugins.Kotlin))
+        implementation(kotlin("stdlib-common", Versions.Plugins.Kotlin))
         implementation(Deps.kotlin.coroutines.common)
       }
     }
-     
+
     commonTest {
       dependencies {
-        implementation(kotlin("test-common"))
-        implementation(kotlin("test-annotations-common"))
+        implementation(kotlin("test-common", Versions.Plugins.Kotlin))
+        implementation(kotlin("test-annotations-common", Versions.Plugins.Kotlin))
       }
     }
 
-
-
     js {
-
       compilations["main"].defaultSourceSet {
         dependencies {
-          implementation(kotlin("stdlib-js"))
+          implementation(kotlin("stdlib-js", Versions.Plugins.Kotlin))
           implementation(Deps.kotlin.coroutines.js)
         }
       }
       compilations["test"].defaultSourceSet {
         dependencies {
-          implementation(kotlin("test-js"))
+          implementation(kotlin("test-js", Versions.Plugins.Kotlin))
         }
       }
     }
 
     all {
-
       languageSettings.apply {
         languageVersion = "1.3"
         apiVersion = "1.3"
@@ -116,14 +112,14 @@ kotlin {
 }
 
 kotlinFrontend {
-  downloadNodeJsVersion = Versions.js.node
-  sourceMaps = true
-
-  npm {
-    devDependency("source-map-support")
-    devDependency("jest")
-    devDependency("jest-junit")
-  }
+  //  downloadNodeJsVersion = Versions.js.node
+//  sourceMaps = true
+//
+//  configure<NpmExtension> {
+//    devDependency("source-map-support")
+//    devDependency("jest")
+//    devDependency("jest-junit")
+//  }
 
 //  bundle<WebPackExtension>("webpack") {
 //    val webPack = this@bundle as WebPackExtension
@@ -133,12 +129,11 @@ kotlinFrontend {
 //  }
 
 
-
 }
 
-fun isAvailableForPublication(publication:MavenPublication):Boolean {
+fun isAvailableForPublication(publication: MavenPublication): Boolean {
   val name = publication.name
-  return arrayOf("jvm","js","metadata","kotlinMultiplatform").contains(name)
+  return arrayOf("jvm", "js", "metadata", "kotlinMultiplatform").contains(name)
 }
 
 tasks.withType<AbstractPublishToMaven>().all {
@@ -157,48 +152,31 @@ val sourcesJar = tasks.register<Jar>("sourceJar") {
 }
 
 val jest = tasks.create("jest", NpmTask::class.java) {
-  args = listOf("run","test")
+  args = listOf("run", "test")
 }
 
 /**
  * Artifacts (SOURCES)
  */
-artifacts {
-  add("archives", sourcesJar)
-}
+//artifacts {
+//  add("archives", sourcesJar)
+//}
 
 
 /**
  * Publication name to be used between
  * maven-publish
  */
-//val publicationName = "${project.name}-publication"
 
-/**
- * Configure publish
- */
-//configure<PublishingExtension> {
-//  publications.create<MavenPublication>(publicationName) {
-//    from(components["java"])
-//    groupId = "org.densebrain"
-//    artifactId = project.name
-//    version = project.version as String
-//    artifact(sourcesJar)
-//
-//  }
-//}
-
-val uploadPublications = mutableListOf<String>()
 
 publishing {
   repositories {
-    mavenLocal()
+    clear()
   }
 
   publications.all { pub ->
     val publication = pub as MavenPublication
     val type = publication.name
-    logger.quiet("Publication: ${name}-${type}")
     publication.groupId = "org.densebrain"
     publication.artifactId = when (type) {
       "metadata" -> "${name}-metadata"
@@ -207,8 +185,8 @@ publishing {
       else -> name
     }
 
-    publication.artifact(sourcesJar.get())
-    publication.version = currentVersion
+    //publication.artifact(sourcesJar.get())
+    publication.version = kduxVersion
     uploadPublications.add(type)
     true
   }
@@ -226,26 +204,18 @@ publishing {
   }
 }
 
-bintray {
-  user = "jonglanz"
-  key = binTrayKey
-  publish = true
-  setPublications(*uploadPublications.toTypedArray())
-  pkg(delegateClosureOf<BintrayExtension.PackageConfig> {
-    repo = "oss"
-    name = project.name
-    userOrg = "densebrain"
-    setLicenses("Apache-2.0")
-    vcsUrl = "https://github.com/jglanz/kdux.git"
-    setVersion(VersionConfig().apply {
-      released = Date().toString()
-      name = currentVersion
-    })
-  })
-}
 
 
 afterEvaluate {
-  tasks.getByName("jsTest").dependsOn(jest)
+  val testTask = tasks.getByName("test")
+
+  testTask.setDependsOn(testTask.dependsOn.filter {
+    logger.quiet("Dep: ${it}/${it.javaClass}")
+    when {
+      it is Task -> !it.name.contains("karma")
+      it is String -> !it.contains("karma")
+      else -> true
+    }
+  })
 }
 
