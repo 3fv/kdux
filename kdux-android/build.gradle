@@ -45,22 +45,22 @@ dependencies {
   androidTestUtil "androidx.test:orchestrator:${Versions.androidTest}"
 }
 
-task sourceJar(type: Jar) {
-  from android.sourceSets.main.java.srcDirs
-  classifier "source"
-}
+//task sourceJar(type: Jar) {
+//  from android.sourceSets.main.java.srcDirs
+//  classifier "source"
+//}
 
-publishing {
-  publications {
-    mavenJava(MavenPublication) {
-      groupId 'org.densebrain'
-      artifactId project.name
-      version VERSION
-
-      artifact bundleReleaseAar
-      artifact sourceJar {
-        classifier "sources"
-      }
-    }
-  }
-}
+//publishing {
+//  publications {
+//    mavenJava(MavenPublication) {
+//      groupId 'org.densebrain'
+//      artifactId project.name
+//      version VERSION
+//
+//      artifact bundleReleaseAar
+//      artifact sourceJar {
+//        classifier "sources"
+//      }
+//    }
+//  }
+//}

@@ -27,7 +27,7 @@ buildscript {
   dependencies {
     classpath "com.android.tools.build:gradle:${Versions.androidGradle}"
     classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${Versions.kotlin}"
-    classpath "com.jfrog.bintray.gradle:gradle-bintray-plugin:${Versions.bintray}"
+//    classpath "com.jfrog.bintray.gradle:gradle-bintray-plugin:${Versions.bintray}"
   
   }
 }
@@ -47,32 +47,32 @@ buildscript {
 /**
  * Publish install all
  */
-task publishAll() {
-  dependsOn(build)
-
-  doLast {
-    println("All published")
-  }
-}
+//task publishAll() {
+//  dependsOn(build)
+//
+//  doLast {
+//    println("All published")
+//  }
+//}
 
 /**
  * Publish install all
  */
-task publishAllLocal() {
-  doLast {
-    println("All published locally")
-  }
-}
+//task publishAllLocal() {
+//  doLast {
+//    println("All published locally")
+//  }
+//}
 
-task installAllLocal() {
-  doLast {
-    println("All installed locally")
-  }
-}
-
-task installLocal() {
-  dependsOn publishAllLocal, installAllLocal
-}
+//task installAllLocal() {
+//  doLast {
+//    println("All installed locally")
+//  }
+//}
+//
+//task installLocal() {
+//  dependsOn publishAllLocal, installAllLocal
+//}
 
 
 
@@ -124,6 +124,7 @@ allprojects {currentProject ->
       exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk7'
       
       force(
+        "androidx.versionedparcelable:versionedparcelable:1.1.1",
         "org.jetbrains.kotlin:kotlin-stdlib:${Versions.kotlin}",
         "org.jetbrains.kotlin:kotlin-stdlib-jre7:${Versions.kotlin}",
         "org.jetbrains.kotlin:kotlin-stdlib-jre8:${Versions.kotlin}",
@@ -156,32 +157,32 @@ allprojects {currentProject ->
   
   
   // PUBLISHING
-  if (publishProjects.contains(currentProject.name)) {
-    apply plugin: 'com.jfrog.bintray'
-    
-    bintray {
-      user = 'jonglanz'
-      key = binTrayKey
-      publications = ['mavenJava']
-      pkg {
-        repo = 'oss'
-        name = currentProject.name
-        userOrg = 'densebrain'
-        licenses = ['Apache-2.0']
-        vcsUrl = 'https://github.com/jglanz/kdux.git'
-        version {
-          name = VERSION
-          released = new Date()
-        }
-      }
-    }
-  
-    build.dependsOn(build)
-    publishAll.dependsOn(bintrayUpload)
-    publishAllLocal.dependsOn(publishToMavenLocal)
-    installAllLocal.dependsOn(install)
-  }
-  
+//  if (publishProjects.contains(currentProject.name)) {
+//    apply plugin: 'com.jfrog.bintray'
+//
+//    bintray {
+//      user = 'jonglanz'
+//      key = binTrayKey
+//      publications = ['mavenJava']
+//      pkg {
+//        repo = 'oss'
+//        name = currentProject.name
+//        userOrg = 'densebrain'
+//        licenses = ['Apache-2.0']
+//        vcsUrl = 'https://github.com/jglanz/kdux.git'
+//        version {
+//          name = VERSION
+//          released = new Date()
+//        }
+//      }
+//    }
+//
+//    build.dependsOn(build)
+//    publishAll.dependsOn(bintrayUpload)
+//    publishAllLocal.dependsOn(publishToMavenLocal)
+//    installAllLocal.dependsOn(install)
+//  }
+//
   // REPOS
   repositories {
     google()
