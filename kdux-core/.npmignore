@@ -1,9 +1,0 @@
-src
-.idea
-*.iml
-build
-!build/js/kdux-core.js
-!build/js/kdux-core.meta.js
-package.json.d
-webpack.config.d
-build.gradle.kts

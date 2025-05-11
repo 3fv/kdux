@@ -1,1 +1,0 @@
-require("../../../build/node_modules/source-map-support").install()
