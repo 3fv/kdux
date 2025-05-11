@@ -1,6 +1,6 @@
 ext {
   Versions = [
-    androidGradle          : '3.3.2',
+    androidGradle          : '3.5.4',
     //androidGradle          : '3.5.0-alpha06',
 
     androidSupport         : '28.0.0',

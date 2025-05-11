@@ -1,38 +1,59 @@
 import com.android.build.gradle.AppExtension
-import java.net.URI
+import com.android.build.gradle.TestedExtension
+import org.gradle.kotlin.dsl.*
+
+import Versions
 
 plugins {
-  id("idea")
   id("com.android.application")
-  kotlin("android") // version(Versions.plugins.kotlin)
-  kotlin("android.extensions") // version(Versions.plugins.kotlin)
-}
-
-androidProjectSetup(project)
-
-configure<AppExtension> {
-	defaultConfig {
-		applicationId = "org.densebrain.kdux.example"
-	}
-
-	dataBinding {
-		isEnabled = true
-	}
+  kotlin("android")
+  kotlin("android.extensions")
 }
 
 repositories {
-  maven { url = URI("https://jitpack.io") }
+  google()
+  gradlePluginPortal()
+  jcenter()
+  mavenCentral()
+  maven { url = uri("https://jitpack.io") }
+  maven {
+    url = uri("https://dl.bintray.com/kotlin/kotlin-eap")
+  }
+}
+
+android {
+  setCompileSdkVersion(Versions.android.compileSdk)
+
+  defaultConfig {
+    applicationId = "org.densebrain.kdux.example"
+    setMinSdkVersion(Versions.android.minSdk)
+    setTargetSdkVersion(Versions.android.targetSdk)
+    versionCode = kduxVersionCode
+    versionName = kduxVersion
+
+
+  }
+
+
+  dataBinding {
+		isEnabled = true
+	}
+
 }
 
 dependencies {
+
 	"implementation"(Deps.android.fb.soLoader)
-	"implementation"(Deps.android.fb.flipper) {
-    isTransitive = true
-  }
-  "implementation"(kduxAndroidFlipperPluginProject) {
-    isTransitive = true
-  }
+  "implementation"(kduxCoreProject)
 	"implementation"(kduxAndroidProject) {
     isTransitive = true
+  }
+
+  listOf(
+    Deps.kotlin.coroutines.common,
+    Deps.kotlin.coroutines.jvm,
+    *Deps.android.lifecycle
+  ).forEach {
+    "implementation"(it)
   }
 }
