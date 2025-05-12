@@ -1,0 +1,110 @@
+[versions]
+agp = "8.7.2"
+kotlin = "2.1.20"
+kotlinxCoroutines = "1.10.2"
+kotlinLogging = "7.0.3"
+coreKtx = "1.16.0"
+androidXTest = "1.4.0"
+junit = "4.13.2"
+junitVersion = "1.2.1"
+espressoCore = "3.6.1"
+lifecycleRuntimeKtx = "2.9.0"
+lifecycleProcess = "2.9.0"
+activityCompose = "1.10.1"
+composeBom = "2025.05.00"
+appcompat = "1.7.0"
+material = "1.12.0"
+constraintlayout = "2.2.1"
+lifecycleLivedataKtx = "2.9.0"
+lifecycleViewmodelKtx = "2.9.0"
+junitJupiter = "5.8.1"
+slf4j = "2.0.13"
+arrow = "0.7.3"
+gson  = "2.8.5"
+semver = "0.9.0"
+bintray = "1.8.4"
+
+
+[libraries]
+kotlin-stdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib", version.ref = "kotlin" }
+kotlin-reflect = { group = "org.jetbrains.kotlin", name = "kotlin-reflect", version.ref = "kotlin" }
+kotlin-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinxCoroutines" }
+kotlin-coroutines-core-jvm = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core-jvm", version.ref = "kotlinxCoroutines" }
+kotlin-test = { group = "org.jetbrains.kotlin", name = "kotlin-test", version.ref = "kotlin" }
+kotlin-test-annotations-common = { group = "org.jetbrains.kotlin", name = "kotlin-test-annotations-common", version.ref = "kotlin" }
+kotlin-gradle-plugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
+
+logging-facade = { group = "io.github.oshai", name = "kotlin-logging-jvm", version.ref = "kotlinLogging" }
+
+semver = { group = "com.github.zafarkhaja", name="java-semver", version.ref = "semver" }
+jfrog-bintray-plugin = { group = "com.jfrog.bintray.gradle", name = "gradle-bintray-plugin", version.ref = "bintray" }
+
+android-build-tools = { group = "com.android.tools.build", name = "gradle", version.ref = "agp"}
+
+androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-lifecycle-process = { group = "androidx.lifecycle", name = "lifecycle-process", version.ref = "lifecycleProcess" }
+androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
+androidx-lifecycle-livedata-ktx = { group = "androidx.lifecycle", name = "lifecycle-livedata-ktx", version.ref = "lifecycleLivedataKtx" }
+androidx-lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "lifecycleViewmodelKtx" }
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+
+androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
+androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
+androidx-ui = { group = "androidx.compose.ui", name = "ui" }
+androidx-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
+androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
+androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
+
+androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
+androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
+
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+
+
+
+junit = { group = "junit", name = "junit", version.ref = "junit" }
+junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter", version.ref = "junitJupiter" }
+androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
+androidx-test-rules = { group = "androidx.test", name = "rules", version.ref = "androidXTest" }
+androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
+androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
+androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
+
+slf4j-simple = { module = "org.slf4j:slf4j-simple", version.ref = "slf4j" }
+slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
+gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
+
+arrow-core = { group = "io.arrow-kt", name = "arrow-core", version.ref = "arrow" }
+arrow-fx = { group = "io.arrow-kt", name = "arrow-fx", version.ref = "arrow" }
+arrow-fx-coroutines = { group = "io.arrow-kt", name = "arrow-fx-coroutines", version.ref = "arrow" }
+arrow-fx-extensions = { group = "io.arrow-kt", name = "arrow-fx-extensions", version.ref = "arrow" }
+arrow-fx-stm = { group = "io.arrow-kt", name = "arrow-fx-stm", version.ref = "arrow" }
+arrow-fx-stm-unsafe = { group = "io.arrow-kt", name = "arrow-fx-stm-unsafe", version.ref = "arrow" }
+arrow-fx-stm-unsafe-jvm = { group = "io.arrow-kt", name = "arrow-fx-stm-unsafe-jvm", version.ref = "arrow" }
+
+[bundles]
+androidx-lifecycle-all = [
+  "androidx-appcompat",
+  "androidx-lifecycle-process",
+  "androidx-lifecycle-runtime-ktx",
+  "androidx-lifecycle-livedata-ktx",
+  "androidx-lifecycle-viewmodel-ktx",
+]
+arrow-all = [
+  "arrow-core",
+  "arrow-fx",
+  "arrow-fx-coroutines",
+  "arrow-fx-extensions",
+  "arrow-fx-stm",
+  "arrow-fx-stm-unsafe",
+  "arrow-fx-stm-unsafe-jvm",
+]
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+android-library = { id = "com.android.library", version.ref = "agp" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version = "2.1.20" }
+kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
+

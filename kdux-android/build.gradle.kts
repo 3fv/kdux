@@ -1,46 +1,46 @@
+
 plugins {
-  id("com.android.library")
-  kotlin("android")
-  kotlin("android.extensions")
-  `kdux-android-publish`
-  `kdux-publish`
+  alias(libs.plugins.android.library)
+  alias(libs.plugins.kotlin.android)
+//  `kdux-android-publish`
+//  `kdux-publish`
 }
 
-repositories {
-  google()
-  gradlePluginPortal()
-  jcenter()
-  mavenCentral()
-  maven { url = uri("https://jitpack.io") }
-  maven {
-    url = uri("https://dl.bintray.com/kotlin/kotlin-eap")
-  }
-}
 
 dependencies {
   implementation(project(":kdux-core"))
-  "implementation"(Deps.kotlin.stdlib.jvm)
-  listOf(
-    Deps.kotlin.coroutines.common,
-    Deps.kotlin.coroutines.jvm,
-    *Deps.android.lifecycle
-  ).forEach {
-    "implementation"(it)
-  }
+  implementation(libs.kotlin.stdlib)
+  implementation(libs.kotlin.coroutines.core)
+  implementation(libs.kotlin.coroutines.core.jvm)
 
-  Deps.android.test.framework.forEach { "androidTestImplementation"(it) }
-  "androidTestUtil"(Deps.android.test.orchestrator)
+  implementation(libs.androidx.core.ktx)
+  implementation(libs.androidx.lifecycle.runtime.ktx)
+  implementation(libs.androidx.lifecycle.process)
+//  implementation(platform(libs.androidx.compose.bom))
+  implementation(libs.androidx.appcompat)
+  implementation(libs.androidx.lifecycle.livedata.ktx)
+  implementation(libs.androidx.lifecycle.viewmodel.ktx)
+
+  testImplementation(libs.junit)
+  androidTestImplementation(libs.androidx.junit)
+  androidTestImplementation(libs.androidx.espresso.core)
+//  androidTestImplementation(platform(libs.androidx.compose.bom))
+//  androidTestImplementation(libs.androidx.ui.test.junit4)
+//  debugImplementation(libs.androidx.ui.tooling)
+//  debugImplementation(libs.androidx.ui.test.manifest)
 
 }
 
 android {
-  setCompileSdkVersion(Versions.android.compileSdk)
+  namespace = "org.densebrain.kdux.android"
+  buildToolsVersion = "35.0.0"
+  compileSdk = 35
 
   defaultConfig {
-    setMinSdkVersion(Versions.android.minSdk)
-    setTargetSdkVersion(Versions.android.targetSdk)
-    versionCode = kduxVersionCode
-    versionName = kduxVersion
+    minSdk = 31
+
+//    versionCode = kduxVersionCode
+//    versionName = kduxVersion
 //      testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
   }
@@ -52,6 +52,33 @@ android {
     }
   }
 
+  buildFeatures {
+    buildConfig = true
+  }
+
+  buildTypes {
+    debug {
+      isMinifyEnabled = false
+      buildConfigField("boolean", "DEBUG", "true")
+    }
+    release {
+      isMinifyEnabled = false
+      proguardFiles(
+        getDefaultProguardFile("proguard-android-optimize.txt"),
+        "proguard-rules.pro"
+      )
+      buildConfigField("boolean", "DEBUG", "false")
+    }
+  }
+
+  compileOptions {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+  }
+
+  kotlinOptions {
+    jvmTarget = "17"
+  }
 }
 
 

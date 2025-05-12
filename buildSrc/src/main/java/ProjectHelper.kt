@@ -3,7 +3,7 @@ import com.android.build.gradle.tasks.BundleAar
 import org.gradle.api.Project
 import org.gradle.api.artifacts.dsl.RepositoryHandler
 import org.gradle.api.initialization.Settings
-import org.gradle.kotlin.dsl.extra
+//import org.gradle.kotlin.dsl.extra
 import org.gradle.kotlin.dsl.getByName
 import org.gradle.kotlin.dsl.project
 import java.io.File
@@ -14,19 +14,16 @@ fun addRepositories(repositoryHandler:RepositoryHandler) = with(repositoryHandle
   mavenLocal()
   google()
   gradlePluginPortal()
-  jcenter()
   mavenCentral()
-  maven { url = java.net.URI("https://jitpack.io") }
-  maven {
-    url = java.net.URI("https://dl.bintray.com/kotlin/kotlin-eap")
-  }
+//  maven { url = java.net.URL("https://jitpack.io") }
 }
 
 private val propertyFileMap = mutableMapOf<File,Properties>()
 
 /**
  * Get properties and cache them for access on all downstream
- * objects, specificaly Project & Settings
+ * objects, specifically Project & Settings
+ *
  * @param dir File
  * @return Properties
  */
@@ -72,23 +69,20 @@ val Project.kduxCoreProject
 val Project.kduxAndroidProject
   get() = dependencies.project(":kdux-android")
 
-val Project.kduxAndroidFlipperPluginProject
-  get() = dependencies.project(":kdux-android-flipper-plugin")
-
 val Project.androidLibraryReleaseAar
   get() = tasks.getByName<BundleAar>("bundleReleaseAar").archiveFile
 
-@Suppress("UNCHECKED_CAST")
-val Project.uploadPublications:MutableList<String>
-  get() =
-    when {
-      extra.has("uploadPublications") -> project.extra["uploadPublications"] as MutableList<String>
-      else -> {
-        val newPubs = mutableListOf<String>()
-        project.extra.set("uploadPublications", newPubs)
-        newPubs
-      }
-    }
+//@Suppress("UNCHECKED_CAST")
+//val Project.uploadPublications:MutableList<String>
+//  get() =
+//    when {
+//      extra.has("uploadPublications") -> project.extra["uploadPublications"] as MutableList<String>
+//      else -> {
+//        val newPubs = mutableListOf<String>()
+//        project.extra.set("uploadPublications", newPubs)
+//        newPubs
+//      }
+//    }
 
 val Project.isAndroidLibrary
   get() = extensions.findByType(BaseExtension::class.java)  != null

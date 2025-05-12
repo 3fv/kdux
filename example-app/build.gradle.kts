@@ -1,59 +1,94 @@
-import com.android.build.gradle.AppExtension
-import com.android.build.gradle.TestedExtension
-import org.gradle.kotlin.dsl.*
-
-import Versions
-
 plugins {
-  id("com.android.application")
-  kotlin("android")
-  kotlin("android.extensions")
-}
-
-repositories {
-  google()
-  gradlePluginPortal()
-  jcenter()
-  mavenCentral()
-  maven { url = uri("https://jitpack.io") }
-  maven {
-    url = uri("https://dl.bintray.com/kotlin/kotlin-eap")
-  }
+  alias(libs.plugins.android.application)
+  alias(libs.plugins.kotlin.android)
+  alias(libs.plugins.kotlin.compose)
+  alias(libs.plugins.kotlin.kapt)
 }
 
 android {
-  setCompileSdkVersion(Versions.android.compileSdk)
+  namespace = "org.densebrain.kdux.example"
+  buildToolsVersion = "35.0.0"
+  compileSdk = 35
+
+  useLibrary("android.test.runner")
+  useLibrary("android.test.base")
+  useLibrary("android.test.mock")
 
   defaultConfig {
     applicationId = "org.densebrain.kdux.example"
-    setMinSdkVersion(Versions.android.minSdk)
-    setTargetSdkVersion(Versions.android.targetSdk)
+
+    minSdk = 31
+    targetSdk = 35
     versionCode = kduxVersionCode
     versionName = kduxVersion
-
-
+    testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+  }
+  buildFeatures {
+    buildConfig = true
+    compose = true
+    viewBinding = true
+    dataBinding = true
   }
 
+  buildTypes {
+    debug {
+      isMinifyEnabled = false
+      buildConfigField("boolean", "DEBUG", "true")
+    }
+    release {
+      isMinifyEnabled = false
+      proguardFiles(
+        getDefaultProguardFile("proguard-android-optimize.txt"),
+        "proguard-rules.pro"
+      )
+      buildConfigField("boolean", "DEBUG", "false")
+    }
+  }
 
-  dataBinding {
-		isEnabled = true
-	}
+  compileOptions {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+  }
+  kotlinOptions {
+    jvmTarget = "17"
+  }
+  dependenciesInfo {
+    includeInApk = true
+    includeInBundle = true
+  }
 
 }
 
 dependencies {
 
-	"implementation"(Deps.android.fb.soLoader)
-  "implementation"(kduxCoreProject)
-	"implementation"(kduxAndroidProject) {
+  implementation(kduxCoreProject)
+  implementation(kduxAndroidProject) {
     isTransitive = true
   }
+  implementation(libs.kotlin.stdlib)
+  implementation(libs.kotlin.coroutines.core)
+  implementation(libs.kotlin.coroutines.core.jvm)
 
-  listOf(
-    Deps.kotlin.coroutines.common,
-    Deps.kotlin.coroutines.jvm,
-    *Deps.android.lifecycle
-  ).forEach {
-    "implementation"(it)
-  }
+  implementation(libs.androidx.core.ktx)
+  implementation(libs.androidx.lifecycle.process)
+  implementation(libs.androidx.lifecycle.runtime.ktx)
+  implementation(libs.androidx.activity.compose)
+  implementation(platform(libs.androidx.compose.bom))
+  implementation(libs.androidx.ui)
+  implementation(libs.androidx.ui.graphics)
+  implementation(libs.androidx.ui.tooling.preview)
+  implementation(libs.androidx.material3)
+  implementation(libs.androidx.appcompat)
+  implementation(libs.material)
+  implementation(libs.androidx.constraintlayout)
+  implementation(libs.androidx.lifecycle.livedata.ktx)
+  implementation(libs.androidx.lifecycle.viewmodel.ktx)
+  testImplementation(libs.junit)
+  androidTestImplementation(libs.androidx.test.rules)
+  androidTestImplementation(libs.androidx.junit)
+  androidTestImplementation(libs.androidx.espresso.core)
+  androidTestImplementation(platform(libs.androidx.compose.bom))
+  androidTestImplementation(libs.androidx.ui.test.junit4)
+  debugImplementation(libs.androidx.ui.tooling)
+  debugImplementation(libs.androidx.ui.test.manifest)
 }

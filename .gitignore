@@ -1,9 +1,10 @@
 *.iml
+.kotlin
 .gradle
-local.properties
 .idea
 .DS_Store
 build
 captures
 .externalNativeBuild
 node_modules
+local.properties
