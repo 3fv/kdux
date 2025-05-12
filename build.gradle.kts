@@ -5,39 +5,55 @@ buildscript {
   addRepositories(repositories)
 
   dependencies {
-    classpath(Deps.gradle.semver)
+    classpath(libs.semver)
   }
 }
 
+plugins {
+  alias(libs.plugins.kotlin.jvm) apply false
+  alias(libs.plugins.kotlin.kapt) apply false
+  alias(libs.plugins.android.application) apply false
+  alias(libs.plugins.android.library) apply false
+  alias(libs.plugins.kotlin.android) apply false
+  alias(libs.plugins.kotlin.compose) apply false
+}
+
+
+interface InjectedOps {
+  @get:Inject val execOps: ExecOperations
+}
 afterEvaluate {
   val versionPatch by tasks.registering {
+    val ops = project.objects.newInstance<InjectedOps>()
+    val execOps: ExecOperations = ops.execOps
+
     doLast {
       val versionFile = File("${rootDir}/version.txt")
       val oldVersion = kduxVersion
       val oldVersionCode = kduxVersionCode
-      
+
       val version = Version.valueOf(oldVersion)
       val newVersion = version.incrementPatchVersion().toString()
       val newVersionCode = oldVersionCode + 1
       versionFile.writeText("${newVersion}\n${newVersionCode}")
 
-      exec {
+      execOps.exec {
         commandLine = listOf("git","add","version.txt")
       }
 
-      exec {
+      execOps.exec {
         commandLine = listOf("git","commit","-m",newVersion)
       }
 
-      exec {
+      execOps.exec {
         commandLine = listOf("git","tag",newVersion)
       }
 
-      exec {
+      execOps.exec {
         commandLine = listOf("git","push","--all")
       }
 
-      exec {
+      execOps.exec {
         commandLine = listOf("git","push","--tags")
       }
     }
@@ -45,9 +61,14 @@ afterEvaluate {
 
   tasks.create("release") {
     dependsOn(versionPatch)
+    val ops = project.objects.newInstance<InjectedOps>()
+    val execOps: ExecOperations = ops.execOps
 
     doLast {
-      exec {
+      // inside build.gradle.kts or a plugin:
+
+
+      execOps.exec {
         commandLine = listOf("./gradlew", "publishAll")
       }
     }

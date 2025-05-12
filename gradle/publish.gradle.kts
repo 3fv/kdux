@@ -1,4 +1,4 @@
-import com.jfrog.bintray.gradle.BintrayExtension
+//import com.jfrog.bintray.gradle.BintrayExtension
 
 //buildscript {
 //

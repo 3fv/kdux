@@ -1,23 +1,32 @@
-enableFeaturePreview("GRADLE_METADATA")
-include(":kdux-core", ":kdux-android",":example-app")
-
-rootProject.name = "kdux-project"
-
 pluginManagement {
-  addRepositories(repositories)
+  repositories {
+    mavenLocal()
 
-  resolutionStrategy {
-    eachPlugin {
-      val module = when {
-        requested.id.namespace == "com.android" -> "com.android.tools.build:gradle:${Versions.Plugins.Android}"
-        else -> null
+    google {
+      content {
+        includeGroupByRegex("com\\.android.*")
+        includeGroupByRegex("com\\.google.*")
+        includeGroupByRegex("androidx.*")
       }
-
-      logger.quiet("Plugin requested (${requested.id.namespace}/${requested.id.name}): ${module}")
-      if (module != null) {
-        useModule(module)
-      }
-
     }
+
+    mavenCentral()
+    maven { setUrl("https://jitpack.io") }
+
+    gradlePluginPortal()
   }
 }
+dependencyResolutionManagement {
+  repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+  repositories {
+    mavenLocal()
+    google()
+    mavenCentral()
+    maven { setUrl("https://jitpack.io") }
+
+  }
+}
+
+
+rootProject.name = "kdux-project"
+include(":kdux-core", ":kdux-android",":example-app")

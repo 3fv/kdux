@@ -9,6 +9,9 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import androidx.lifecycle.ProcessLifecycleOwner
+import androidx.lifecycle.coroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.lang.IllegalStateException
 
 class AndroidStoreUpdateScheduler(context: Context) : StoreUpdateScheduler, LifecycleObserver {
@@ -54,7 +57,11 @@ class AndroidStoreUpdateScheduler(context: Context) : StoreUpdateScheduler, Life
   }
 
   init {
-    ProcessLifecycleOwner.get().lifecycle.addObserver(this)
+    val lifecycle = ProcessLifecycleOwner.get().lifecycle
+    lifecycle.coroutineScope.launch(Dispatchers.Main) {
+      lifecycle.addObserver(this@AndroidStoreUpdateScheduler)
+    }
+
   }
 
 

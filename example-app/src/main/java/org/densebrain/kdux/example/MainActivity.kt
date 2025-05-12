@@ -5,10 +5,9 @@ import androidx.databinding.DataBindingUtil
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProviders
+//import androidx.lifecycle.ViewModelProviders
 import org.densebrain.kdux.android.StateLiveData
 import org.densebrain.kdux.example.databinding.ActivityMainBinding
-import org.densebrain.kdux.example.store.ExampleActions
 import org.densebrain.kdux.example.store.ExampleState
 import org.densebrain.kdux.store.actions
 import org.densebrain.kdux.store.observations
