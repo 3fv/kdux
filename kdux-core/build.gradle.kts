@@ -1,16 +1,13 @@
-import com.jfrog.bintray.gradle.BintrayExtension
-import org.gradle.api.publish.maven.internal.publication.DefaultMavenPublication
-import java.util.Date
 
 plugins {
   alias(libs.plugins.kotlin.kapt)
   alias(libs.plugins.kotlin.jvm)
-//  kotlin("jvm") version libs.versions.kotlin
   `java-library`
-//  `maven-publish`
-//  `kdux-publish`
+  `maven-publish`
 }
-
+val ghCreds = githubCredentials
+val ghUser: String? = ghCreds.first
+val ghToken: String? = ghCreds.second
 dependencies {
   implementation(libs.kotlin.stdlib)
   implementation(libs.kotlin.reflect)
@@ -29,37 +26,30 @@ dependencies {
 /**
  * Sources JAR for distro
  */
-//val sourcesJar = tasks.register<Jar>("sourceJar") {
-//  classifier = "sources"
-//  from(
-//    sourceSets["main"].java.srcDirs
-////    *kotlin.sourceSets.map { sourceSet -> sourceSet.kotlin.srcDirs }.toTypedArray()
-//  )
-//}
+java {
+  withSourcesJar()
+}
 
-/**
- * Publication name to be used between
- * maven-publish
- */
-//publishing {
-//  repositories {
-//    clear()
-//  }
-//
-//  publications.all { pub ->
-//    val publication = pub as MavenPublication
-//    val type = publication.name
-//    publication.groupId = "org.densebrain"
-//    publication.artifactId = when (type) {
-//      "metadata" -> "${name}-metadata"
-//      "jvm" -> "${name}-jvm"
-//      else -> name
-//    }
-//
-//    //publication.artifact(sourcesJar.get())
-//    publication.version = kduxVersion
-//    uploadPublications.add(type)
-//    true
-//  }
-//}
-//
+configure<PublishingExtension> {
+  repositories {
+    maven {
+      group = "org.tfv"
+      name = "GitHubPackages"
+      url = uri("https://maven.pkg.github.com/3fv/kdux")
+      credentials {
+        username = ghUser
+        password = ghToken
+      }
+    }
+  }
+  publications {
+    register<MavenPublication>("gpr") {
+      groupId = "org.tfv"
+      artifactId = project.name
+      version = kduxVersion
+
+      from(components["java"])
+
+    }
+  }
+}

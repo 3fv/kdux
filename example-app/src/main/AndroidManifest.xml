@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           xmlns:tools="http://schemas.android.com/tools"
-          package="org.densebrain.kdux.example"
+          package="org.tfv.kdux.example"
 >
 
   <uses-permission android:name="android.permission.INTERNET"/>
   <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
 
   <application
-    android:name=".Application"
+    android:name="org.tfv.kdux.example.Application"
     android:icon="@mipmap/ic_launcher"
     android:label="@string/app_name"
     android:roundIcon="@mipmap/ic_launcher_round"
@@ -24,7 +24,7 @@
 
 
     <activity
-      android:name=".MainActivity" android:theme="@style/Theme.AppCompat"
+      android:name="org.tfv.kdux.example.MainActivity" android:theme="@style/Theme.AppCompat"
       android:exported="true"
     >
       <intent-filter>
