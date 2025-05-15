@@ -1,17 +1,11 @@
-import org.gradle.kotlin.dsl.maven
-import java.io.File
-import java.util.*
 
 pluginManagement {
 
   repositories {
-    jcenter()
     mavenCentral()
     gradlePluginPortal()
-    maven(url = "https://plugins.gradle.org/m2")
-    maven(url = uri("https://groovy.jfrog.io/artifactory/libs-release"))
-//    maven(url = "https://dl.bintray.com/densebrain/oss")
-
+    maven { url = uri("https://plugins.gradle.org/m2") }
+    maven { url = uri("https://maven.pkg.github.com/3fv/kdux") }
   }
 
 }

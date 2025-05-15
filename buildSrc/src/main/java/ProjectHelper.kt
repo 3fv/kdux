@@ -3,10 +3,10 @@ import com.android.build.gradle.tasks.BundleAar
 import org.gradle.api.Project
 import org.gradle.api.artifacts.dsl.RepositoryHandler
 import org.gradle.api.initialization.Settings
-//import org.gradle.kotlin.dsl.extra
 import org.gradle.kotlin.dsl.getByName
 import org.gradle.kotlin.dsl.project
 import java.io.File
+import java.net.URI
 import java.util.*
 
 
@@ -15,7 +15,8 @@ fun addRepositories(repositoryHandler:RepositoryHandler) = with(repositoryHandle
   google()
   gradlePluginPortal()
   mavenCentral()
-//  maven { url = java.net.URL("https://jitpack.io") }
+  maven { url = URI("https://jitpack.io") }
+  maven { url = URI("https://maven.pkg.github.com/3fv/kdux") }
 }
 
 private val propertyFileMap = mutableMapOf<File,Properties>()
@@ -54,6 +55,14 @@ fun Settings.hasProperty(key: String) =
 
 operator fun Settings.get(key: String) = if (hasProperty(key)) property(key) else null
 
+val Project.githubCredentials: Pair<String?, String?>
+  get() {
+    val props = getProperties(rootProject.projectDir)
+    return Pair(
+      (props["gpr.user"] ?: System.getenv("GITHUB_USER")) as String?,
+      (props["gpr.token"] ?: System.getenv("GITHUB_TOKEN")) as String?)
+  }
+
 val Project.kduxVersions
   get() = File(rootProject.projectDir,"version.txt").readText().split("\n").let { Pair(it[0], it[1].toInt()) }
 
@@ -84,8 +93,10 @@ val Project.androidLibraryReleaseAar
 //      }
 //    }
 
-val Project.isAndroidLibrary
-  get() = extensions.findByType(BaseExtension::class.java)  != null
+val Project.isAndroidLibrary: Boolean
+  get() {
+    return name.contains("android")
+  }
 
 val Project.assembleTaskName
   get() = when {
@@ -106,9 +117,6 @@ val Project.assembleTask
 val Project.defaultPublicationName
   get() = "${project.name}-publication"
 
-
-val Project.binTrayKey
-  get() = System.getenv("BINTRAY_API_KEY") ?: ""
-
 val Project.publishedProjects:List<String>
-  get() = listOf(":kdux-core",":kdux-android")
+  //get() = listOf("kdux-core")
+  get() = listOf("kdux-core","kdux-android")
