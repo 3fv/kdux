@@ -18,11 +18,30 @@ plugins {
   alias(libs.plugins.kotlin.compose) apply false
 }
 
-
 interface InjectedOps {
-  @get:Inject val execOps: ExecOperations
+  @get:Inject
+  val execOps: ExecOperations
 }
+
 afterEvaluate {
+
+  // EXPLICITLY SET PUBLISH TO DEPEND ON `ProjectHelpers.Project.assembleTask`
+  publishedProjects.forEach { pubName ->
+    val pubProject = project(pubName)
+    pubProject.afterEvaluate {
+      pubProject.tasks {
+        val publishTask = getByName("publish")
+        val assembleTask = assembleTask
+        if (assembleTask != null) {
+          publishTask.mustRunAfter(assembleTask)
+        }
+      }
+    }
+  }
+
+  /**
+   * This task will increment the patch version of the project and commit the changes to git.
+   */
   val versionPatch by tasks.registering {
     val ops = project.objects.newInstance<InjectedOps>()
     val execOps: ExecOperations = ops.execOps
@@ -38,49 +57,41 @@ afterEvaluate {
       versionFile.writeText("${newVersion}\n${newVersionCode}")
 
       execOps.exec {
-        commandLine = listOf("git","add","version.txt")
+        commandLine = listOf("git", "add", "version.txt")
       }
 
       execOps.exec {
-        commandLine = listOf("git","commit","-m",newVersion)
+        commandLine = listOf("git", "commit", "-m", newVersion)
       }
 
       execOps.exec {
-        commandLine = listOf("git","tag",newVersion)
+        commandLine = listOf("git", "tag", newVersion)
       }
 
       execOps.exec {
-        commandLine = listOf("git","push","--all")
+        commandLine = listOf("git", "push", "--all")
       }
 
       execOps.exec {
-        commandLine = listOf("git","push","--tags")
+        commandLine = listOf("git", "push", "--tags")
       }
     }
   }
 
+  /**
+   * This task will publish the project to the github.com/3fv/kdux maven repo.
+   */
   tasks.create("release") {
     dependsOn(versionPatch)
     val ops = project.objects.newInstance<InjectedOps>()
     val execOps: ExecOperations = ops.execOps
 
     doLast {
-      // inside build.gradle.kts or a plugin:
-
-
       execOps.exec {
-        commandLine = listOf("./gradlew", "publishAll")
+        commandLine = listOf("./gradlew", "publish")
       }
     }
   }
 
-
-//  val publishTasks = publishedProjects.map { name ->
-//    project(name).tasks.getByName("publish")
-//  }
-//
-//
-//  tasks.create("publishAll") {
-//    dependsOn(publishTasks)
-//  }
 }
+

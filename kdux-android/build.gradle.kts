@@ -1,11 +1,17 @@
+import com.android.build.gradle.BaseExtension
+import com.android.build.gradle.tasks.BundleAar
+import org.gradle.kotlin.dsl.get
+import org.gradle.kotlin.dsl.getByName
 
 plugins {
   alias(libs.plugins.android.library)
   alias(libs.plugins.kotlin.android)
-//  `kdux-android-publish`
-//  `kdux-publish`
+  `maven-publish`
 }
 
+val ghCreds = githubCredentials
+val ghUser: String? = ghCreds.first
+val ghToken: String? = ghCreds.second
 
 dependencies {
   implementation(project(":kdux-core"))
@@ -16,7 +22,6 @@ dependencies {
   implementation(libs.androidx.core.ktx)
   implementation(libs.androidx.lifecycle.runtime.ktx)
   implementation(libs.androidx.lifecycle.process)
-//  implementation(platform(libs.androidx.compose.bom))
   implementation(libs.androidx.appcompat)
   implementation(libs.androidx.lifecycle.livedata.ktx)
   implementation(libs.androidx.lifecycle.viewmodel.ktx)
@@ -24,32 +29,16 @@ dependencies {
   testImplementation(libs.junit)
   androidTestImplementation(libs.androidx.junit)
   androidTestImplementation(libs.androidx.espresso.core)
-//  androidTestImplementation(platform(libs.androidx.compose.bom))
-//  androidTestImplementation(libs.androidx.ui.test.junit4)
-//  debugImplementation(libs.androidx.ui.tooling)
-//  debugImplementation(libs.androidx.ui.test.manifest)
 
 }
 
 android {
-  namespace = "org.densebrain.kdux.android"
+  namespace = "org.tfv.kdux.android"
   buildToolsVersion = "35.0.0"
   compileSdk = 35
 
   defaultConfig {
     minSdk = 31
-
-//    versionCode = kduxVersionCode
-//    versionName = kduxVersion
-//      testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-
-  }
-
-  buildTypes {
-    getByName("release") {
-      isMinifyEnabled = false
-      setProguardFiles(listOf(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"))
-    }
   }
 
   buildFeatures {
@@ -79,6 +68,43 @@ android {
   kotlinOptions {
     jvmTarget = "17"
   }
+
+
 }
 
+val sourcesJar = tasks.register<Jar>("sourcesJar") {
+  archiveClassifier.set("sources")
+  from(project.the<BaseExtension>().sourceSets["main"].java.srcDirs)
+}
 
+artifacts {
+  add("archives", sourcesJar)
+}
+
+afterEvaluate {
+  configure<PublishingExtension> {
+    repositories {
+      maven {
+        group = "org.tfv"
+        name = "GitHubPackages"
+        url = uri("https://maven.pkg.github.com/3fv/kdux")
+        credentials {
+          username = ghUser
+          password = ghToken
+        }
+      }
+    }
+    publications {
+      register<MavenPublication>("gpr") {
+        groupId = "org.tfv"
+        artifactId = project.name
+        version = kduxVersion
+
+        val aarFile = tasks.getByName<BundleAar>("bundleReleaseAar").archiveFile
+        logger.quiet("Release AAR: ${aarFile.get().asFile.absolutePath}")
+        artifact(sourcesJar.get())
+        artifact(aarFile)
+      }
+    }
+  }
+}

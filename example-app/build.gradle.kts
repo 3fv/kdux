@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-  namespace = "org.densebrain.kdux.example"
+  namespace = "org.tfv.kdux.example"
   buildToolsVersion = "35.0.0"
   compileSdk = 35
 
@@ -15,7 +15,7 @@ android {
   useLibrary("android.test.mock")
 
   defaultConfig {
-    applicationId = "org.densebrain.kdux.example"
+    applicationId = "org.tfv.kdux.example"
 
     minSdk = 31
     targetSdk = 35

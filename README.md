@@ -2,17 +2,13 @@
 
 ## Use it in an android project
 
-```groovy
+```kotlin
 repositories {
-    maven {
-        url  "https://dl.bintray.com/densebrain/oss" 
-    }
+    maven { url = uri("https://maven.pkg.github.com/3fv/kdux") }
 }
 
 dependencies {
-  implementation "org.densebrain:kdux-core:1+"
-  implementation "org.densebrain:kdux-android:1+"
-  
-  kapt "org.densebrain:kdux-processor:1+"
+  implementation("org.tfv:kdux-core:1+")
+  implementation("org.tfv:kdux-android:1+")
 }
 ```
